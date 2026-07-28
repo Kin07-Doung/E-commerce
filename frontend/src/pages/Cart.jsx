@@ -65,7 +65,7 @@ const Cart = () => {
                     <tr key={item.id} className="hover:bg-slate-50">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-4">
-                           <img loading="lazy" src={item.image_url || 'https://via.placeholder.com/80'} alt={item.name} className="w-12 h-12 rounded-lg object-cover border border-slate-200" />
+                           <img loading="lazy" src={item.image_url || 'data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20300%20300%22%3E%3Crect%20fill=%22%23e2e8f0%22%20width=%22300%22%20height=%22300%22/%3E%3Ctext%20fill=%22%2394a3b8%22%20font-family=%22sans-serif%22%20font-size=%2216%22%20x=%2250%25%22%20y=%2250%25%22%20text-anchor=%22middle%22%20dy=%22.3em%22%3ENo%20Image%3C/text%3E%3C/svg%3E'} alt={item.name} className="w-12 h-12 rounded-lg object-cover border border-slate-200" />
                           <div>
                             <Link to={`/products/${item.product_id}`} className="text-sm font-medium text-slate-800 hover:text-blue-600">{item.name}</Link>
                             <p className="text-xs text-slate-500 mt-0.5">{item.category_name || 'Uncategorized'}</p>
@@ -117,3 +117,7 @@ const Cart = () => {
 };
 
 export default Cart;
+
+
+
+

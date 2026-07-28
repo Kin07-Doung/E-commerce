@@ -20,8 +20,8 @@ const AdminPOS = () => {
       api.get('/admin/products'),
       api.get('/categories')
     ]);
-    setProducts(productsRes.data);
-    setCategories(categoriesRes.data);
+    setProducts(productsRes.data.products || productsRes.data);
+    setCategories(categoriesRes.data.categories || categoriesRes.data);
   };
 
   const filtered = products.filter(p => {
@@ -237,3 +237,5 @@ const AdminPOS = () => {
 };
 
 export default AdminPOS;
+
+

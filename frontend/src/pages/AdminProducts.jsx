@@ -19,12 +19,13 @@ const AdminProducts = () => {
 
   const loadProducts = async () => {
     const res = await api.get('/admin/products');
-    setProducts(res.data);
+    const data = res.data;
+    setProducts(data.products || data);
   };
 
   const loadCategories = async () => {
     const res = await api.get('/categories');
-    setCategories(res.data);
+    setCategories(res.data.categories || res.data);
   };
 
   const handleImageChange = (e) => {
@@ -243,3 +244,4 @@ const AdminProducts = () => {
 };
 
 export default AdminProducts;
+

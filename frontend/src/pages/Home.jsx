@@ -13,7 +13,10 @@ const Home = () => {
       const data = res.data;
       setProducts(data.products || data);
     }).catch(() => {});
-    api.get('/categories').then(res => setCategories(res.data)).catch(() => {});
+    api.get('/categories').then(res => {
+      const data = res.data;
+      setCategories(data.categories || data);
+    }).catch(() => {});
   }, []);
 
   const addToCart = async (product) => {

@@ -132,8 +132,8 @@ router.delete('/products/:id', async (req, res) => {
 
 router.get('/export/products', async (req, res) => {
   try {
-    const products = await Product.findAll();
-    const categories = await Category.findAll();
+    const products = await Product.findAll(1, 10000);
+    const categories = await Category.findAll(1, 10000);
     const categoryMap = {};
     categories.forEach(c => categoryMap[c.id] = c.name);
 
@@ -163,7 +163,7 @@ router.get('/export/products', async (req, res) => {
 
 router.get('/export/categories', async (req, res) => {
   try {
-    const categories = await Category.findAll();
+    const categories = await Category.findAll(1, 10000);
     const headers = ['ID', 'Name'];
     const rows = categories.map(c => [c.id, c.name]);
     const csvContent = [

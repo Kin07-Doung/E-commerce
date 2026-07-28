@@ -14,16 +14,16 @@ async function seed() {
     categories.forEach(c => catMap[c.name] = c.id);
 
     const products = [
-      { name: 'Wireless Headphones', description: 'High-quality wireless headphones with noise cancellation.', price: 79.99, stock: 50, category: 'Electronics', image: 'https://via.placeholder.com/500?text=Headphones' },
-      { name: 'Smartphone', description: 'Latest model smartphone with amazing camera.', price: 699.99, stock: 30, category: 'Electronics', image: 'https://via.placeholder.com/500?text=Smartphone' },
-      { name: 'Laptop', description: 'Powerful laptop for work and gaming.', price: 1299.99, stock: 20, category: 'Electronics', image: 'https://via.placeholder.com/500?text=Laptop' },
-      { name: 'Cotton T-Shirt', description: 'Comfortable cotton t-shirt available in multiple colors.', price: 19.99, stock: 100, category: 'Clothing', image: 'https://via.placeholder.com/500?text=T-Shirt' },
-      { name: 'Denim Jeans', description: 'Classic fit denim jeans.', price: 49.99, stock: 80, category: 'Clothing', image: 'https://via.placeholder.com/500?text=Jeans' },
-      { name: 'Running Shoes', description: 'Lightweight running shoes for daily training.', price: 89.99, stock: 40, category: 'Clothing', image: 'https://via.placeholder.com/500?text=Shoes' },
-      { name: 'JavaScript Guide', description: 'Complete guide to modern JavaScript.', price: 34.99, stock: 60, category: 'Books', image: 'https://via.placeholder.com/500?text=JS+Book' },
-      { name: 'React Handbook', description: 'Master React with this comprehensive handbook.', price: 29.99, stock: 55, category: 'Books', image: 'https://via.placeholder.com/500?text=React+Book' },
-      { name: 'Coffee Maker', description: 'Programmable coffee maker with thermal carafe.', price: 79.99, stock: 25, category: 'Home & Kitchen', image: 'https://via.placeholder.com/500?text=Coffee+Maker' },
-      { name: 'Desk Lamp', description: 'LED desk lamp with adjustable brightness.', price: 34.99, stock: 70, category: 'Home & Kitchen', image: 'https://via.placeholder.com/500?text=Desk+Lamp' }
+      { name: 'Wireless Headphones', description: 'High-quality wireless headphones with noise cancellation.', price: 79.99, stock: 50, category: 'Electronics', image: '' },
+      { name: 'Smartphone', description: 'Latest model smartphone with amazing camera.', price: 699.99, stock: 30, category: 'Electronics', image: '' },
+      { name: 'Laptop', description: 'Powerful laptop for work and gaming.', price: 1299.99, stock: 20, category: 'Electronics', image: '' },
+      { name: 'Cotton T-Shirt', description: 'Comfortable cotton t-shirt available in multiple colors.', price: 19.99, stock: 100, category: 'Clothing', image: '' },
+      { name: 'Denim Jeans', description: 'Classic fit denim jeans.', price: 49.99, stock: 80, category: 'Clothing', image: '' },
+      { name: 'Running Shoes', description: 'Lightweight running shoes for daily training.', price: 89.99, stock: 40, category: 'Clothing', image: '' },
+      { name: 'JavaScript Guide', description: 'Complete guide to modern JavaScript.', price: 34.99, stock: 60, category: 'Books', image: '' },
+      { name: 'React Handbook', description: 'Master React with this comprehensive handbook.', price: 29.99, stock: 55, category: 'Books', image: '' },
+      { name: 'Coffee Maker', description: 'Programmable coffee maker with thermal carafe.', price: 79.99, stock: 25, category: 'Home & Kitchen', image: '' },
+      { name: 'Desk Lamp', description: 'LED desk lamp with adjustable brightness.', price: 34.99, stock: 70, category: 'Home & Kitchen', image: '' }
     ];
 
     for (const p of products) {

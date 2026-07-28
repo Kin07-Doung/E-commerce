@@ -2,21 +2,24 @@ import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import ProductCard from '../components/ProductCard';
 
+const PRODUCTS_PER_PAGE = 12;
+
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     api.get('/products').then(res => {
       setProducts(res.data.products || res.data);
-      setTotalPages(res.data.totalPages || 1);
     }).catch(() => {});
-    api.get('/categories').then(res => setCategories(res.data)).catch(() => {});
+    api.get('/categories').then(res => {
+      const data = res.data;
+      setCategories(data.categories || data);
+    }).catch(() => {});
   }, []);
 
   const addToCart = async (product) => {
@@ -34,6 +37,13 @@ const Products = () => {
     const matchSearch = p.name.toLowerCase().includes(search.toLowerCase());
     return matchCat && matchSearch;
   });
+
+  const totalPages = Math.ceil(filtered.length / PRODUCTS_PER_PAGE) || 1;
+  const paginated = filtered.slice((page - 1) * PRODUCTS_PER_PAGE, page * PRODUCTS_PER_PAGE);
+
+  useEffect(() => {
+    setPage(1);
+  }, [selectedCategory, search]);
 
   return (
     <div className="space-y-8">
@@ -72,12 +82,12 @@ const Products = () => {
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {filtered.map(product => (
+              {paginated.map(product => (
                 <ProductCard key={product.id} product={product} onAddToCart={addToCart} />
               ))}
             </div>
             {totalPages > 1 && (
-              <div className="flex justify-center gap-2">
+              <div className="flex justify-center gap-2 items-center">
                 <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed">Previous</button>
                 <span className="px-4 py-2 text-sm text-slate-500">Page {page} of {totalPages}</span>
                 <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages} className="px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed">Next</button>

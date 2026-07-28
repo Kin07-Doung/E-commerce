@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 
+const CATEGORIES_PER_PAGE = 15;
+
 const AdminCategories = () => {
   const [categories, setCategories] = useState([]);
   const [name, setName] = useState('');
@@ -8,6 +10,8 @@ const AdminCategories = () => {
   const [editName, setEditName] = useState('');
   const [error, setError] = useState('');
   const [importing, setImporting] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     loadCategories();
@@ -15,7 +19,9 @@ const AdminCategories = () => {
 
   const loadCategories = async () => {
     const res = await api.get('/categories');
-    setCategories(res.data);
+    const data = res.data;
+    setCategories(data.categories || data);
+    setTotalPages(data.totalPages || 1);
   };
 
   const handleCreate = async (e) => {
@@ -74,6 +80,12 @@ const AdminCategories = () => {
     }
   };
 
+  const paginated = categories.slice((page - 1) * CATEGORIES_PER_PAGE, page * CATEGORIES_PER_PAGE);
+
+  useEffect(() => {
+    setPage(1);
+  }, [categories.length]);
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -115,7 +127,7 @@ const AdminCategories = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
-            {categories.map(cat => (
+            {paginated.map(cat => (
               <tr key={cat.id} className="hover:bg-slate-50 transition-colors">
                 <td className="px-6 py-4 text-sm text-slate-500">#{cat.id}</td>
                 <td className="px-6 py-4">
@@ -153,6 +165,13 @@ const AdminCategories = () => {
           </tbody>
         </table>
       </div>
+      {totalPages > 1 && (
+        <div className="flex justify-center gap-2 items-center">
+          <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed">Previous</button>
+          <span className="px-4 py-2 text-sm text-slate-500">Page {page} of {totalPages}</span>
+          <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages} className="px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed">Next</button>
+        </div>
+      )}
     </div>
   );
 };

@@ -62,7 +62,7 @@ const AdminLayout = () => {
         </div>
       </aside>
       <div className={`fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden ${sidebarOpen ? 'block' : 'hidden'}`} onClick={closeSidebar} />
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 md:ml-64">
         <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8">
           <button
             onClick={() => setSidebarOpen(true)}

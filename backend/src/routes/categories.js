@@ -7,8 +7,11 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
   try {
-    const categories = await Category.findAll();
-    res.json(categories);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const categories = await Category.findAll(page, limit);
+    const total = await Category.findAllCount();
+    res.json({ categories, total, page, limit, totalPages: Math.ceil(total / limit) });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }
