@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
+import Button from '../components/ui/Button';
 
 const AdminPOS = () => {
   const [products, setProducts] = useState([]);
@@ -38,7 +39,7 @@ const AdminPOS = () => {
         if (existing.quantity >= product.stock) return prev;
         return prev.map(item => item.product_id === product.id ? { ...item, quantity: item.quantity + 1 } : item);
       }
-      return [...prev, { ...product, quantity: 1 }];
+      return [...prev, { ...product, product_id: product.id, quantity: 1 }];
     });
   };
 
@@ -91,7 +92,7 @@ const AdminPOS = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">POS Terminal</h1>
           <p className="text-sm text-slate-500 mt-1">Process sales and manage transactions</p>
@@ -123,11 +124,11 @@ const AdminPOS = () => {
                 <svg className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
               </div>
               <div className="flex gap-2 flex-wrap">
-                <button onClick={() => setSelectedCategory(null)} className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${!selectedCategory ? 'bg-blue-600 text-white border-blue-600' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'}`}>All</button>
+                <Button key="cat-all" variant={selectedCategory ? 'outline' : 'primary'} size="sm" onClick={() => setSelectedCategory(null)}>All</Button>
                 {categories.map(cat => (
-                  <button key={cat.id} onClick={() => setSelectedCategory(cat.id)} className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${selectedCategory === cat.id ? 'bg-blue-600 text-white border-blue-600' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'}`}>
+                  <Button key={`cat-${cat.id}`} variant={selectedCategory === cat.id ? 'primary' : 'outline'} size="sm" onClick={() => setSelectedCategory(cat.id)}>
                     {cat.name}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
@@ -194,12 +195,12 @@ const AdminPOS = () => {
                         <p className="text-xs text-slate-500">${parseFloat(item.price).toFixed(2)} each</p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <button onClick={() => updateQuantity(item.product_id, -1)} className="w-6 h-6 flex items-center justify-center bg-white border border-slate-200 rounded text-slate-600 hover:bg-slate-100">-</button>
+                        <Button variant="outline" size="icon" className="rounded text-slate-600 hover:bg-slate-100" onClick={() => updateQuantity(item.product_id, -1)}>-</Button>
                         <span className="text-sm font-semibold w-6 text-center">{item.quantity}</span>
-                        <button onClick={() => updateQuantity(item.product_id, 1)} className="w-6 h-6 flex items-center justify-center bg-white border border-slate-200 rounded text-slate-600 hover:bg-slate-100">+</button>
-                        <button onClick={() => removeFromCart(item.product_id)} className="ml-2 text-red-600 hover:text-red-700">
+                        <Button variant="outline" size="icon" className="rounded text-slate-600 hover:bg-slate-100" onClick={() => updateQuantity(item.product_id, 1)}>+</Button>
+                        <Button variant="ghost" className="ml-2 text-red-600 hover:text-red-700 hover:bg-transparent" onClick={() => removeFromCart(item.product_id)}>
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   ))
@@ -221,13 +222,15 @@ const AdminPOS = () => {
                 </div>
               </div>
 
-              <button
-                onClick={handleCheckout}
+              <Button
+                variant="primary"
+                size="lg"
+                className="w-full mt-4"
                 disabled={cart.length === 0 || processing}
-                className="w-full mt-4 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:bg-slate-400 disabled:cursor-not-allowed transition-colors"
+                onClick={handleCheckout}
               >
                 {processing ? 'Processing...' : `Complete Sale (${cartCount} items)`}
-              </button>
+              </Button>
             </div>
           </div>
         </div>

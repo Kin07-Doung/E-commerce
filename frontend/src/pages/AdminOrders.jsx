@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
+import Button from '../components/ui/Button';
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -36,7 +37,7 @@ const AdminOrders = () => {
         <table className="w-full min-w-[900px]">
           <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Order ID</th>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">#</th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Customer</th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Payment</th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Total</th>
@@ -46,9 +47,9 @@ const AdminOrders = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
-            {orders.map(order => (
+            {orders.map((order, index) => (
               <tr key={order.id} className="hover:bg-slate-50">
-                <td className="px-6 py-4 text-sm font-medium text-slate-800">#{order.id}</td>
+                <td className="px-6 py-4 text-sm text-slate-500">{index + 1}</td>
                 <td className="px-6 py-4 text-sm text-slate-600">{order.shipping_address}</td>
                 <td className="px-6 py-4 text-sm text-slate-600 capitalize">{order.payment_method || 'cash'}</td>
                 <td className="px-6 py-4 text-sm font-semibold text-slate-800">${parseFloat(order.total).toFixed(2)}</td>
@@ -91,9 +92,9 @@ const AdminOrders = () => {
       </div>
       {totalPages > 1 && (
         <div className="flex justify-center gap-2">
-          <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed">Previous</button>
+          <Button variant="outline" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1}>Previous</Button>
           <span className="px-4 py-2 text-sm text-slate-500">Page {page} of {totalPages}</span>
-          <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages} className="px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed">Next</button>
+          <Button variant="outline" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages}>Next</Button>
         </div>
       )}
     </div>

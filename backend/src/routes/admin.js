@@ -126,7 +126,11 @@ router.delete('/products/:id', async (req, res) => {
     }
     res.json({ message: 'Product deleted' });
   } catch (err) {
-    res.status(500).json({ message: 'Server error' });
+    if (err.code === 'ER_ROW_IS_REFERENCED_2') {
+      res.status(400).json({ message: 'Cannot delete product: it is referenced by order items' });
+    } else {
+      res.status(500).json({ message: 'Server error' });
+    }
   }
 });
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
+import Button from '../components/ui/Button';
 
 const CATEGORIES_PER_PAGE = 15;
 
@@ -58,8 +59,20 @@ const AdminCategories = () => {
     }
   };
 
-  const handleExport = () => {
-    window.open('/api/admin/export/categories', '_blank');
+  const handleExport = async () => {
+    try {
+      const response = await api.get('/admin/export/categories', { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'categories.csv');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert(err.response?.data?.message || 'Export failed');
+    }
   };
 
   const handleImport = async (e) => {
@@ -88,12 +101,10 @@ const AdminCategories = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <h2 className="text-2xl font-bold text-slate-800">Categories</h2>
-        <div className="flex gap-2">
-          <button onClick={handleExport} className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 shadow-sm">
-            Export CSV
-          </button>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="success" onClick={handleExport}>Export CSV</Button>
           <label className="bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-orange-700 shadow-sm cursor-pointer">
             Import CSV
             <input type="file" accept=".csv" onChange={handleImport} className="hidden" disabled={importing} />
@@ -104,7 +115,7 @@ const AdminCategories = () => {
       <div className="bg-white rounded-xl border border-slate-200 p-6">
         <h3 className="text-lg font-bold text-slate-800 mb-4">Add Category</h3>
         {error && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm mb-4">{error}</div>}
-        <form onSubmit={handleCreate} className="flex gap-3">
+        <form onSubmit={handleCreate} className="flex flex-col sm:flex-row gap-3">
           <input
             type="text"
             placeholder="Category name"
@@ -113,7 +124,7 @@ const AdminCategories = () => {
             required
             className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           />
-          <button type="submit" className="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 shadow-sm">Add Category</button>
+          <Button type="submit" variant="primary">Add Category</Button>
         </form>
       </div>
 
@@ -121,15 +132,15 @@ const AdminCategories = () => {
         <table className="w-full min-w-[600px]">
           <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">ID</th>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">#</th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Name</th>
               <th className="px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
-            {paginated.map(cat => (
+            {paginated.map((cat, index) => (
               <tr key={cat.id} className="hover:bg-slate-50 transition-colors">
-                <td className="px-6 py-4 text-sm text-slate-500">#{cat.id}</td>
+                <td className="px-6 py-4 text-sm text-slate-500">{index + 1}</td>
                 <td className="px-6 py-4">
                   {editingId === cat.id ? (
                     <input
@@ -145,13 +156,13 @@ const AdminCategories = () => {
                 <td className="px-6 py-4 text-sm text-right">
                   {editingId === cat.id ? (
                     <div className="flex gap-2 justify-end">
-                      <button onClick={() => handleUpdate(cat.id)} className="text-green-600 hover:text-green-700 font-medium">Save</button>
-                      <button onClick={() => { setEditingId(null); setEditName(''); }} className="text-slate-500 hover:text-slate-700 font-medium">Cancel</button>
+                      <Button variant="textSuccess" size="sm" onClick={() => handleUpdate(cat.id)}>Save</Button>
+                      <Button variant="text" size="sm" onClick={() => { setEditingId(null); setEditName(''); }}>Cancel</Button>
                     </div>
                   ) : (
                     <div className="flex gap-3 justify-end">
-                      <button onClick={() => { setEditingId(cat.id); setEditName(cat.name); }} className="text-blue-600 hover:text-blue-700 font-medium">Edit</button>
-                      <button onClick={() => handleDelete(cat.id)} className="text-red-600 hover:text-red-700 font-medium">Delete</button>
+                      <Button variant="textPrimary" size="sm" onClick={() => { setEditingId(cat.id); setEditName(cat.name); }}>Edit</Button>
+                      <Button variant="textDanger" size="sm" onClick={() => handleDelete(cat.id)}>Delete</Button>
                     </div>
                   )}
                 </td>
@@ -167,9 +178,9 @@ const AdminCategories = () => {
       </div>
       {totalPages > 1 && (
         <div className="flex justify-center gap-2 items-center">
-          <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed">Previous</button>
+          <Button variant="outline" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1}>Previous</Button>
           <span className="px-4 py-2 text-sm text-slate-500">Page {page} of {totalPages}</span>
-          <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages} className="px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed">Next</button>
+          <Button variant="outline" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages}>Next</Button>
         </div>
       )}
     </div>

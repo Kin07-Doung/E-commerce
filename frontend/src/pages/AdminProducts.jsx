@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
+import Button from '../components/ui/Button';
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
@@ -91,8 +92,20 @@ const AdminProducts = () => {
     }
   };
 
-  const handleExport = () => {
-    window.open('/api/admin/export/products', '_blank');
+  const handleExport = async () => {
+    try {
+      const response = await api.get('/admin/export/products', { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'products.csv');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert(err.response?.data?.message || 'Export failed');
+    }
   };
 
   const handleImport = async (e) => {
@@ -115,19 +128,15 @@ const AdminProducts = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <h2 className="text-2xl font-bold text-slate-800">Products</h2>
-        <div className="flex gap-2">
-          <button onClick={handleExport} className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 shadow-sm">
-            Export CSV
-          </button>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="success" onClick={handleExport}>Export CSV</Button>
           <label className="bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-orange-700 shadow-sm cursor-pointer">
             Import CSV
             <input type="file" accept=".csv" onChange={handleImport} className="hidden" disabled={importing} />
           </label>
-          <button onClick={() => { setShowForm(true); setEditingProduct(null); setForm({ name: '', description: '', price: '', stock: '', category_id: '', image_url: '' }); setImagePreview(''); setImageFile(null); }} className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 shadow-sm">
-            + Add Product
-          </button>
+          <Button variant="primary" onClick={() => { setShowForm(true); setEditingProduct(null); setForm({ name: '', description: '', price: '', stock: '', category_id: '', image_url: '' }); setImagePreview(''); setImageFile(null); }}>+ Add Product</Button>
         </div>
       </div>
 
@@ -166,8 +175,8 @@ const AdminProducts = () => {
               <textarea placeholder="Product description..." value={form.description} onChange={e => setForm({...form, description: e.target.value})} rows={3} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-y" />
             </div>
             <div className="md:col-span-2 flex gap-3 pt-2">
-              <button type="submit" className="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700 shadow-sm">{editingProduct ? 'Update Product' : 'Create Product'}</button>
-              <button type="button" onClick={() => { setShowForm(false); setEditingProduct(null); setImagePreview(''); setImageFile(null); }} className="bg-white text-slate-700 border border-slate-200 px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-slate-50">Cancel</button>
+              <Button type="submit" variant="primary" size="lg">{editingProduct ? 'Update Product' : 'Create Product'}</Button>
+              <Button type="button" variant="secondary" size="lg" onClick={() => { setShowForm(false); setEditingProduct(null); setImagePreview(''); setImageFile(null); }}>Cancel</Button>
             </div>
           </form>
         </div>
@@ -177,6 +186,7 @@ const AdminProducts = () => {
         <table className="w-full min-w-[900px]">
           <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">#</th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Product</th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Category</th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Price</th>
@@ -185,8 +195,9 @@ const AdminProducts = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
-            {products.map(product => (
+            {products.map((product, index) => (
               <tr key={product.id} className="hover:bg-slate-50 transition-colors">
+                <td className="px-6 py-4 text-sm text-slate-500">{index + 1}</td>
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
                     {product.image_url && (
@@ -205,8 +216,7 @@ const AdminProducts = () => {
                     <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${product.stock < 10 ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
                       {product.stock}
                     </span>
-                    <button
-                      onClick={async () => {
+                    <Button variant="textPrimary" size="sm" className="text-xs" onClick={async () => {
                         const newStock = prompt('Enter new stock quantity:', product.stock);
                         if (newStock !== null && !isNaN(newStock)) {
                           try {
@@ -223,16 +233,14 @@ const AdminProducts = () => {
                             alert(err.response?.data?.message || 'Failed to update stock');
                           }
                         }
-                      }}
-                      className="text-xs text-blue-600 hover:text-blue-700"
-                    >
+                      }}>
                       Edit
-                    </button>
+                    </Button>
                   </div>
                 </td>
                 <td className="px-6 py-4 text-sm text-right">
-                  <button onClick={() => handleEdit(product)} className="text-blue-600 hover:text-blue-700 font-medium mr-3">Edit</button>
-                  <button onClick={() => handleDelete(product.id)} className="text-red-600 hover:text-red-700 font-medium">Delete</button>
+                  <Button variant="textPrimary" className="mr-3" onClick={() => handleEdit(product)}>Edit</Button>
+                  <Button variant="textDanger" onClick={() => handleDelete(product.id)}>Delete</Button>
                 </td>
               </tr>
             ))}

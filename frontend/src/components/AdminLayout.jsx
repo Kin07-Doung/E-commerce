@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import Button from './ui/Button';
 
 const AdminLayout = () => {
   const { user, logout } = useAuth();
@@ -56,27 +57,29 @@ const AdminLayout = () => {
             </div>
           </div>
           <div className="flex gap-2">
-            <Link to="/" onClick={closeSidebar} className="flex-1 text-center text-xs py-2 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition-colors">Store</Link>
-            <button onClick={logout} className="flex-1 text-xs py-2 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition-colors">Logout</button>
+            <Link to="/" onClick={closeSidebar} className="flex-1 text-center text-xs py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition-colors">Store</Link>
+            <Button variant="sidebar" size="sm" className="flex-1" onClick={logout}>Logout</Button>
           </div>
         </div>
       </aside>
       <div className={`fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden ${sidebarOpen ? 'block' : 'hidden'}`} onClick={closeSidebar} />
       <div className="flex-1 flex flex-col min-w-0 md:ml-64">
         <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8">
-          <button
+          <Button
             onClick={() => setSidebarOpen(true)}
-            className="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors"
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
             aria-label="Open sidebar"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
-          </button>
-          <div className="text-sm text-slate-500" id="page-title">
+          </Button>
+          <div className="text-sm text-slate-500 truncate" id="page-title">
             {navItems.find(item => item.exact ? location.pathname === item.path : isActive(item.path))?.label || 'Dashboard'}
           </div>
-          <div className="flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-4">
             <div className="text-right">
               <p className="text-sm font-medium text-slate-700">{new Date().toLocaleDateString()}</p>
               <p className="text-xs text-slate-500">{new Date().toLocaleTimeString()}</p>
@@ -86,7 +89,7 @@ const AdminLayout = () => {
             </div>
           </div>
         </header>
-        <main className="flex-1 p-4 md:p-8 overflow-auto">
+        <main className="flex-1 p-4 md:p-8 overflow-auto max-w-7xl mx-auto w-full">
           <Outlet />
         </main>
       </div>
