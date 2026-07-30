@@ -1,19 +1,21 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useAlert } from '../context/AlertContext';
 
 const ProductCard = ({ product, onAddToCart }) => {
   const { user } = useAuth();
+  const { showError } = useAlert();
 
   const handleAddToCart = (e) => {
     e.preventDefault();
     e.stopPropagation();
     if (!user) {
-      alert('Please login to add items to cart');
+      showError('Please login to add items to cart');
       return;
     }
     if (product.stock <= 0) {
-      alert('Out of stock');
+      showError('Out of stock');
       return;
     }
     if (onAddToCart) {

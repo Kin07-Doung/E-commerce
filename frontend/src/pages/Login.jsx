@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import Alert from '../components/ui/Alert';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -70,7 +71,7 @@ const Login = () => {
           <h2 className="text-2xl font-bold text-slate-800">Login</h2>
           <p className="text-sm text-slate-500 mt-1">Welcome back to ShopHub</p>
         </div>
-        {error && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm mb-4">{error}</div>}
+        {error && <Alert variant="error">{error}</Alert>}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-1.5">Email</label>

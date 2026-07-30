@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import Button from '../components/ui/Button';
+import { useAlert } from '../context/AlertContext';
+import Alert from '../components/ui/Alert';
 
 const CATEGORIES_PER_PAGE = 15;
 
@@ -13,6 +15,7 @@ const AdminCategories = () => {
   const [importing, setImporting] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const { showSuccess, showError } = useAlert();
 
   useEffect(() => {
     loadCategories();
@@ -55,7 +58,7 @@ const AdminCategories = () => {
       await api.delete(`/categories/${id}`);
       loadCategories();
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to delete category');
+      showError(err.response?.data?.message || 'Failed to delete category');
     }
   };
 
@@ -71,7 +74,7 @@ const AdminCategories = () => {
       link.remove();
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      alert(err.response?.data?.message || 'Export failed');
+      showError(err.response?.data?.message || 'Export failed');
     }
   };
 
@@ -83,10 +86,10 @@ const AdminCategories = () => {
       const data = new FormData();
       data.append('file', file);
       const res = await api.post('/admin/import/categories', data);
-      alert(`Import complete: ${res.data.imported} imported, ${res.data.failed} failed`);
+      showSuccess(`Import complete: ${res.data.imported} imported, ${res.data.failed} failed`);
       loadCategories();
     } catch (err) {
-      alert(err.response?.data?.message || 'Import failed');
+      showError(err.response?.data?.message || 'Import failed');
     } finally {
       setImporting(false);
       e.target.value = '';
@@ -114,7 +117,7 @@ const AdminCategories = () => {
 
       <div className="bg-white rounded-xl border border-slate-200 p-6">
         <h3 className="text-lg font-bold text-slate-800 mb-4">Add Category</h3>
-        {error && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm mb-4">{error}</div>}
+        {error && <Alert variant="error">{error}</Alert>}
         <form onSubmit={handleCreate} className="flex flex-col sm:flex-row gap-3">
           <input
             type="text"

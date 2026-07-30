@@ -1,8 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useAlert } from '../context/AlertContext';
 import api from '../services/api';
 import Footer from './Footer';
+import Toast from './ui/Toast';
+
+const ToastContainer = () => {
+  const { toasts, removeToast } = useAlert();
+  return (
+    <div className="fixed top-20 right-4 z-[100] space-y-2 pointer-events-none">
+      {toasts.map(toast => (
+        <div key={toast.id} className="pointer-events-auto">
+          <Toast message={toast.message} type={toast.type} onClose={() => removeToast(toast.id)} />
+        </div>
+      ))}
+    </div>
+  );
+};
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -66,7 +81,7 @@ const Navbar = () => {
           </button>
           <div className={`${mobileMenuOpen ? 'flex' : 'hidden'} md:flex flex-col md:flex-row gap-5 items-center absolute md:static top-16 left-0 right-0 bg-white md:bg-transparent border-b md:border-b-0 border-slate-200 p-4 md:p-0`}>
             <Link to="/products" onClick={closeMobileMenu} className="text-slate-600 text-sm font-medium hover:text-blue-600 transition-colors">Products</Link>
-            <Link to="/cart" onClick={closeMobileMenu} className="relative text-slate-600 hover:text-blue-600 transition-colors">
+            <Link to="/cart" onClick={(e) => { if (!user) { e.preventDefault(); navigate('/login'); } closeMobileMenu(); }} className="relative text-slate-600 hover:text-blue-600 transition-colors">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
@@ -99,6 +114,7 @@ const Navbar = () => {
         <main className="flex-1">
           <Outlet />
         </main>
+        <ToastContainer />
         <Footer />
       </div>
     </>

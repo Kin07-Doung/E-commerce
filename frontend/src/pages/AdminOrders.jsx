@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import Button from '../components/ui/Button';
+import { useAlert } from '../context/AlertContext';
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const { showSuccess, showError } = useAlert();
 
   useEffect(() => {
     api.get('/admin/orders/all?page=1&limit=20')
@@ -23,8 +25,9 @@ const AdminOrders = () => {
     try {
       await api.patch(`/admin/orders/${id}/status`, { status });
       setOrders(prev => prev.map(order => order.id === id ? { ...order, status } : order));
+      showSuccess(`Order #${id} status updated to ${status}`);
     } catch (err) {
-      alert('Failed to update status');
+      showError('Failed to update status');
     }
   };
 
