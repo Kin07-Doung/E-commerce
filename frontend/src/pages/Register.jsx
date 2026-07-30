@@ -15,8 +15,21 @@ const Register = () => {
     const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
     if (!googleClientId) return;
 
-    if (window.__googleSignInInitialized) return;
-    window.__googleSignInInitialized = true;
+    const renderGoogleButton = () => {
+      if (!window.google) return;
+      const buttonContainer = document.getElementById('google-signin-button');
+      if (!buttonContainer) return;
+      buttonContainer.innerHTML = '';
+      window.google.accounts.id.renderButton(buttonContainer, {
+        theme: 'outline',
+        size: 'large'
+      });
+    };
+
+    if (window.google) {
+      renderGoogleButton();
+      return;
+    }
 
     const script = document.createElement('script');
     script.src = 'https://accounts.google.com/gsi/client';
@@ -37,19 +50,7 @@ const Register = () => {
             }
           }
         });
-        const buttonContainer = document.getElementById('google-signin-button');
-        if (buttonContainer) {
-          window.google.accounts.id.renderButton(buttonContainer, {
-            theme: 'outline',
-            size: 'large'
-          });
-        }
-      }
-    };
-
-    return () => {
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
+        renderGoogleButton();
       }
     };
   }, [googleSignIn, navigate]);
