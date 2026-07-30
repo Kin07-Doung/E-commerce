@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import ProductCard from '../components/ProductCard';
+import { useAlert } from '../context/AlertContext';
 
 const Home = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const { showSuccess, showError } = useAlert();
 
   useEffect(() => {
     api.get('/products').then(res => {
@@ -23,9 +25,9 @@ const Home = () => {
     try {
       await api.post('/cart', { product_id: product.id, quantity: 1 });
       window.dispatchEvent(new Event('cart-updated'));
-      alert('Added to cart!');
+      showSuccess('Added to cart!');
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to add to cart');
+      showError(err.response?.data?.message || 'Failed to add to cart');
     }
   };
 

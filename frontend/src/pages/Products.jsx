@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import ProductCard from '../components/ProductCard';
+import { useAlert } from '../context/AlertContext';
 
 const PRODUCTS_PER_PAGE = 12;
 
@@ -11,6 +12,7 @@ const Products = () => {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const { showSuccess, showError } = useAlert();
 
   useEffect(() => {
     api.get('/products').then(res => {
@@ -26,9 +28,9 @@ const Products = () => {
     try {
       await api.post('/cart', { product_id: product.id, quantity: 1 });
       window.dispatchEvent(new Event('cart-updated'));
-      alert('Added to cart!');
+      showSuccess('Added to cart!');
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to add to cart');
+      showError(err.response?.data?.message || 'Failed to add to cart');
     }
   };
 

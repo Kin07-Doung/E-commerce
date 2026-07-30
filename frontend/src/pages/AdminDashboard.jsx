@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
+import Alert from '../components/ui/Alert';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
@@ -111,7 +112,9 @@ const AdminDashboard = () => {
           </div>
           <div className="divide-y divide-slate-200">
             {lowStock.length === 0 ? (
-              <div className="px-6 py-8 text-center text-slate-500 text-sm">All products are well stocked</div>
+              <div className="px-6 py-8 text-center">
+                <Alert variant="success">All products are well stocked</Alert>
+              </div>
             ) : (
               lowStock.map(product => (
                 <div key={product.id} className="px-6 py-4 flex items-center justify-between">
@@ -120,7 +123,10 @@ const AdminDashboard = () => {
                     <p className="text-xs text-slate-500 mt-0.5">{product.category_name || 'Uncategorized'}</p>
                   </div>
                   <div className="text-right">
-                    <span className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-red-50 border border-red-200 text-red-700">
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3.586l-.879.66a1 1 0 001.44 1.44l.879-.66V6z" clipRule="evenodd" />
+                      </svg>
                       {product.stock} left
                     </span>
                   </div>

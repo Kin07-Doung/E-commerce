@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import Button from '../components/ui/Button';
+import { useAlert } from '../context/AlertContext';
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
@@ -12,6 +13,7 @@ const AdminProducts = () => {
   const [imagePreview, setImagePreview] = useState('');
   const [imageFile, setImageFile] = useState(null);
   const [importing, setImporting] = useState(false);
+  const { showSuccess, showError } = useAlert();
 
   useEffect(() => {
     loadProducts();
@@ -53,7 +55,7 @@ const AdminProducts = () => {
       const url = editingProduct ? `/admin/products/${editingProduct.id}` : '/admin/products';
       const method = editingProduct ? api.put : api.post;
       const response = await method(url, data);
-      alert('Success: ' + (response.data.name || 'Product saved'));
+      showSuccess('Success: ' + (response.data.name || 'Product saved'));
       setShowForm(false);
       setEditingProduct(null);
       setForm({ name: '', description: '', price: '', stock: '', category_id: '', image_url: '' });
@@ -62,7 +64,7 @@ const AdminProducts = () => {
       loadProducts();
     } catch (err) {
       const msg = err.response?.data?.message || err.response?.data?.errors?.map(e => e.msg).join(', ') || 'Operation failed';
-      alert('Error: ' + msg);
+      showError(err.response?.data?.message || err.response?.data?.errors?.map(e => e.msg).join(', ') || 'Operation failed');
       console.error('Product submit error:', err.response || err);
     }
   };
@@ -88,7 +90,7 @@ const AdminProducts = () => {
       await api.delete(`/admin/products/${id}`);
       loadProducts();
     } catch (err) {
-      alert(err.response?.data?.message || 'Delete failed');
+      showError(err.response?.data?.message || 'Delete failed');
     }
   };
 
@@ -104,7 +106,7 @@ const AdminProducts = () => {
       link.remove();
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      alert(err.response?.data?.message || 'Export failed');
+      showError(err.response?.data?.message || 'Export failed');
     }
   };
 
@@ -116,10 +118,10 @@ const AdminProducts = () => {
       const data = new FormData();
       data.append('file', file);
       const res = await api.post('/admin/import/products', data);
-      alert(`Import complete: ${res.data.imported} imported, ${res.data.failed} failed`);
+      showSuccess(`Import complete: ${res.data.imported} imported, ${res.data.failed} failed`);
       loadProducts();
     } catch (err) {
-      alert(err.response?.data?.message || 'Import failed');
+      showError(err.response?.data?.message || 'Import failed');
     } finally {
       setImporting(false);
       e.target.value = '';
@@ -230,7 +232,7 @@ const AdminProducts = () => {
                             await api.put(`/admin/products/${product.id}`, formData);
                             loadProducts();
                           } catch (err) {
-                            alert(err.response?.data?.message || 'Failed to update stock');
+                            showError(err.response?.data?.message || 'Failed to update stock');
                           }
                         }
                       }}>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import Button from '../components/ui/Button';
+import { useAlert } from '../context/AlertContext';
 
 const AdminPOS = () => {
   const [products, setProducts] = useState([]);
@@ -11,6 +12,7 @@ const AdminPOS = () => {
   const [customerName, setCustomerName] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('cash');
   const [processing, setProcessing] = useState(false);
+  const { showSuccess, showError } = useAlert();
 
   useEffect(() => {
     loadData();
@@ -82,9 +84,9 @@ const AdminPOS = () => {
       setCustomerName('');
       setPaymentMethod('cash');
       loadData();
-      alert('Order placed successfully!');
+      showSuccess('Order placed successfully!');
     } catch (err) {
-      alert(err.response?.data?.message || 'Checkout failed');
+      showError(err.response?.data?.message || 'Checkout failed');
     } finally {
       setProcessing(false);
     }
