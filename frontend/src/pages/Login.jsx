@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Alert from '../components/ui/Alert';
+import { useGoogleSignIn } from '../hooks/useGoogleSignIn';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -10,49 +11,16 @@ const Login = () => {
   const { login, googleSignIn } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-    if (!googleClientId) return;
-
-    const renderGoogleButton = () => {
-      if (!window.google) return;
-      const buttonContainer = document.getElementById('google-signin-button-login');
-      if (!buttonContainer) return;
-      buttonContainer.innerHTML = '';
-      window.google.accounts.id.renderButton(buttonContainer, {
-        theme: 'outline',
-        size: 'large'
-      });
-    };
-
-    if (window.google) {
-      renderGoogleButton();
-      return;
+  const handleGoogleSignIn = async (credential) => {
+    try {
+      await googleSignIn(credential);
+      navigate('/');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Google sign-in failed');
     }
+  };
 
-    const script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.async = true;
-    script.defer = true;
-    document.body.appendChild(script);
-
-    script.onload = () => {
-      if (window.google) {
-        window.google.accounts.id.initialize({
-          client_id: googleClientId,
-          callback: async (response) => {
-            try {
-              await googleSignIn(response.credential);
-              navigate('/');
-            } catch (err) {
-              setError(err.response?.data?.message || 'Google sign-in failed');
-            }
-          }
-        });
-        renderGoogleButton();
-      }
-    };
-  }, [googleSignIn, navigate]);
+  useGoogleSignIn(handleGoogleSignIn, 'google-signin-button-login');
 
   const handleSubmit = async (e) => {
     e.preventDefault();

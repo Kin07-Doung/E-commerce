@@ -90,7 +90,7 @@ router.post('/google', async (req, res) => {
       if (user) {
         return res.status(400).json({ message: 'Email already registered with email/password. Please login instead.' });
       }
-      const userId = await User.create({ name, email, provider: 'google', googleId });
+      const userId = await User.create({ name, email, password: crypto.randomBytes(16).toString('hex'), provider: 'google', googleId });
       user = await User.findById(userId);
     }
 
