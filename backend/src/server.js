@@ -29,10 +29,11 @@ app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 const PORT = process.env.PORT || 5000;
 
 async function start() {
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
   try {
     await db.query('SELECT 1');
     console.log('MySQL connected successfully');
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   } catch (err) {
     console.error('MySQL connection failed:', err.message);
     console.log('Retrying in 5 seconds...');
