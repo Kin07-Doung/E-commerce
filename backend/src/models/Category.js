@@ -20,8 +20,8 @@ const Category = {
     return rows[0];
   },
 
-  async create({ name }) {
-    const [result] = await pool.query('INSERT INTO categories (name) VALUES (?)', [name]);
+  async create({ name, description }) {
+    const [result] = await pool.query('INSERT INTO categories (name, description) VALUES (?, ?)', [name, description]);
     return result.insertId;
   }
 };

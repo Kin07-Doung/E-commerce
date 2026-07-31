@@ -29,8 +29,9 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/', authenticate, authorizeAdmin, [
-  body('name').notEmpty().withMessage('Name is required')
+  router.post('/', authenticate, authorizeAdmin, [
+  body('name').notEmpty().withMessage('Name is required'),
+  body('description').optional().isString().withMessage('Description must be a string')
 ], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -38,8 +39,8 @@ router.post('/', authenticate, authorizeAdmin, [
   }
 
   try {
-    const { name } = req.body;
-    const categoryId = await Category.create({ name });
+    const { name, description } = req.body;
+    const categoryId = await Category.create({ name, description });
     const category = await Category.findById(categoryId);
     res.status(201).json(category);
   } catch (err) {
@@ -50,8 +51,9 @@ router.post('/', authenticate, authorizeAdmin, [
   }
 });
 
-router.put('/:id', authenticate, authorizeAdmin, [
-  body('name').notEmpty().withMessage('Name is required')
+  router.put('/:id', authenticate, authorizeAdmin, [
+  body('name').notEmpty().withMessage('Name is required'),
+  body('description').optional().isString().withMessage('Description must be a string')
 ], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -59,10 +61,10 @@ router.put('/:id', authenticate, authorizeAdmin, [
   }
 
   try {
-    const { name } = req.body;
+    const { name, description } = req.body;
     const [result] = await require('../config/db').query(
-      'UPDATE categories SET name = ? WHERE id = ?',
-      [name, req.params.id]
+      'UPDATE categories SET name = ?, description = ? WHERE id = ?',
+      [name, description, req.params.id]
     );
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'Category not found' });

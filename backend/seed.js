@@ -5,8 +5,11 @@ const bcrypt = require('bcryptjs');
 async function seed() {
   try {
     await pool.query(`
-      INSERT IGNORE INTO categories (name) VALUES 
-      ('Electronics'), ('Clothing'), ('Books'), ('Home & Kitchen')
+      INSERT IGNORE INTO categories (name, description) VALUES 
+      ('Electronics', 'Electronic devices and gadgets'),
+      ('Clothing', 'Apparel and fashion items'),
+      ('Books', 'Books and reading materials'),
+      ('Home & Kitchen', 'Home and kitchen essentials')
     `);
 
     const [categories] = await pool.query('SELECT id, name FROM categories');

@@ -40,8 +40,8 @@ router.post('/', authenticate, [
   }
 
   try {
-    const { name, description, price, stock, category_id, image_url } = req.body;
-    const productId = await Product.create({ name, description, price, stock, category_id, image_url });
+    const { name, description, price, stock, category_id, image_url, barcode } = req.body;
+    const productId = await Product.create({ name, description, price, stock, category_id, image_url, barcode });
     const product = await Product.findById(productId);
     res.status(201).json(product);
   } catch (err) {
@@ -51,8 +51,8 @@ router.post('/', authenticate, [
 
 router.put('/:id', authenticate, async (req, res) => {
   try {
-    const { name, description, price, stock, category_id, image_url } = req.body;
-    const updated = await Product.update(req.params.id, { name, description, price, stock, category_id, image_url });
+    const { name, description, price, stock, category_id, image_url, barcode } = req.body;
+    const updated = await Product.update(req.params.id, { name, description, price, stock, category_id, image_url, barcode });
     if (!updated) {
       return res.status(404).json({ message: 'Product not found' });
     }

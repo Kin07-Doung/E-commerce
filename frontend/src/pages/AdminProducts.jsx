@@ -8,7 +8,7 @@ const AdminProducts = () => {
   const [categories, setCategories] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
-  const [form, setForm] = useState({ name: '', description: '', price: '', stock: '', category_id: '', image_url: '' });
+  const [form, setForm] = useState({ name: '', description: '', price: '', stock: '', category_id: '', image_url: '', barcode: '' });
   const [imagePreview, setImagePreview] = useState('');
   const [imageFile, setImageFile] = useState(null);
   const [importing, setImporting] = useState(false);
@@ -49,6 +49,7 @@ const AdminProducts = () => {
       if (imageFile) {
         data.append('image', imageFile);
       }
+      data.append('barcode', form.barcode);
 
       const url = editingProduct ? `/admin/products/${editingProduct.id}` : '/admin/products';
       const method = editingProduct ? api.put : api.post;
@@ -56,7 +57,7 @@ const AdminProducts = () => {
       alert('Success: ' + (response.data.name || 'Product saved'));
       setShowForm(false);
       setEditingProduct(null);
-      setForm({ name: '', description: '', price: '', stock: '', category_id: '', image_url: '' });
+      setForm({ name: '', description: '', price: '', stock: '', category_id: '', image_url: '', barcode: '' });
       setImagePreview('');
       setImageFile(null);
       loadProducts();
@@ -75,7 +76,8 @@ const AdminProducts = () => {
       price: product.price.toString(),
       stock: product.stock.toString(),
       category_id: product.category_id?.toString() || '',
-      image_url: product.image_url || ''
+      image_url: product.image_url || '',
+      barcode: product.barcode || ''
     });
     setImagePreview(product.image_url || '');
     setImageFile(null);
@@ -136,7 +138,7 @@ const AdminProducts = () => {
             Import CSV
             <input type="file" accept=".csv" onChange={handleImport} className="hidden" disabled={importing} />
           </label>
-          <Button variant="primary" onClick={() => { setShowForm(true); setEditingProduct(null); setForm({ name: '', description: '', price: '', stock: '', category_id: '', image_url: '' }); setImagePreview(''); setImageFile(null); }}>+ Add Product</Button>
+          <Button variant="primary" onClick={() => { setShowForm(true); setEditingProduct(null); setForm({ name: '', description: '', price: '', stock: '', category_id: '', image_url: '', barcode: '' }); setImagePreview(''); setImageFile(null); }}>+ Add Product</Button>
         </div>
       </div>
 
@@ -171,6 +173,10 @@ const AdminProducts = () => {
               )}
             </div>
             <div className="md:col-span-2">
+              <label className="block text-xs font-medium text-slate-500 mb-1.5">Barcode</label>
+              <input type="text" placeholder="Product barcode..." value={form.barcode} onChange={e => setForm({...form, barcode: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+            </div>
+            <div className="md:col-span-2">
               <label className="block text-xs font-medium text-slate-500 mb-1.5">Description</label>
               <textarea placeholder="Product description..." value={form.description} onChange={e => setForm({...form, description: e.target.value})} rows={3} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-y" />
             </div>
@@ -188,6 +194,7 @@ const AdminProducts = () => {
             <tr>
               <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">#</th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Product</th>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Barcode</th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Category</th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Price</th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Stock</th>
@@ -209,6 +216,7 @@ const AdminProducts = () => {
                     </div>
                   </div>
                 </td>
+                <td className="px-6 py-4 text-sm font-medium text-slate-800">{product.barcode || '-'}</td>
                 <td className="px-6 py-4 text-sm text-slate-600">{product.category_name || '-'}</td>
                 <td className="px-6 py-4 text-sm font-medium text-slate-800">${parseFloat(product.price).toFixed(2)}</td>
                 <td className="px-6 py-4">
@@ -227,6 +235,7 @@ const AdminProducts = () => {
                             formData.append('stock', parseInt(newStock).toString());
                             formData.append('category_id', product.category_id?.toString() || '');
                             formData.append('image_url', product.image_url || '');
+                            formData.append('barcode', product.barcode || '');
                             await api.put(`/admin/products/${product.id}`, formData);
                             loadProducts();
                           } catch (err) {

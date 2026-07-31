@@ -92,7 +92,8 @@ router.post('/products', upload.single('image'), productValidators, async (req, 
     if (req.file) {
       image_url = `/uploads/${req.file.filename}`;
     }
-    const productId = await Product.create({ name, description, price, stock, category_id, image_url });
+    const barcode = req.body.barcode || '';
+    const productId = await Product.create({ name, description, price, stock, category_id, image_url, barcode });
     const product = await Product.findById(productId);
     res.status(201).json(product);
   } catch (err) {
@@ -107,7 +108,8 @@ router.put('/products/:id', upload.single('image'), productValidators, async (re
     if (req.file) {
       image_url = `/uploads/${req.file.filename}`;
     }
-    const updated = await Product.update(req.params.id, { name, description, price, stock, category_id, image_url });
+    const barcode = req.body.barcode || '';
+    const updated = await Product.update(req.params.id, { name, description, price, stock, category_id, image_url, barcode });
     if (!updated) {
       return res.status(404).json({ message: 'Product not found' });
     }
@@ -141,7 +143,7 @@ router.get('/export/products', async (req, res) => {
     const categoryMap = {};
     categories.forEach(c => categoryMap[c.id] = c.name);
 
-    const headers = ['ID', 'Name', 'Description', 'Price', 'Stock', 'Category', 'Image URL'];
+    const headers = ['ID', 'Name', 'Description', 'Price', 'Stock', 'Category', 'Image URL', 'Barcode'];
     const rows = products.map(p => [
       p.id,
       p.name,
@@ -149,7 +151,8 @@ router.get('/export/products', async (req, res) => {
       p.price,
       p.stock,
       categoryMap[p.category_id] || '',
-      p.image_url || ''
+      p.image_url || '',
+      p.barcode || ''
     ]);
 
     const csvContent = [
@@ -165,23 +168,23 @@ router.get('/export/products', async (req, res) => {
   }
 });
 
-router.get('/export/categories', async (req, res) => {
-  try {
-    const categories = await Category.findAll(1, 10000);
-    const headers = ['ID', 'Name'];
-    const rows = categories.map(c => [c.id, c.name]);
-    const csvContent = [
-      headers.join(','),
-      ...rows.map(r => r.map(cell => `"${cell}"`).join(','))
-    ].join('\n');
+  router.get('/export/categories', async (req, res) => {
+    try {
+      const categories = await Category.findAll(1, 10000);
+      const headers = ['ID', 'Name', 'Description'];
+      const rows = categories.map(c => [c.id, c.name, c.description || '']);
+      const csvContent = [
+        headers.join(','),
+        ...rows.map(r => r.map(cell => `"${cell}"`).join(','))
+      ].join('\n');
 
-    res.header('Content-Type', 'text/csv');
-    res.attachment('categories.csv');
-    res.send(csvContent);
-  } catch (err) {
-    res.status(500).json({ message: 'Server error' });
-  }
-});
+      res.header('Content-Type', 'text/csv');
+      res.attachment('categories.csv');
+      res.send(csvContent);
+    } catch (err) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
 
 router.post('/import/products', csvUpload.single('file'), async (req, res) => {
   if (!req.file) {
@@ -262,13 +265,14 @@ router.post('/import/categories', csvUpload.single('file'), async (req, res) => 
       });
 
       const name = row['Name'] || row['name'];
+      const description = row['Description'] || row['description'] || '';
       if (!name) {
         results.push({ row: i + 1, status: 'error', message: 'Name is required' });
         continue;
       }
 
       try {
-        await Category.create(name);
+        await Category.create({ name, description });
         results.push({ row: i + 1, status: 'success', name });
       } catch (err) {
         results.push({ row: i + 1, status: 'error', message: 'Category may already exist' });

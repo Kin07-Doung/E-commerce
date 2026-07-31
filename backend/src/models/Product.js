@@ -36,18 +36,18 @@ const Product = {
     return rows;
   },
 
-  async create({ name, description, price, stock, category_id, image_url }) {
+  async create({ name, description, price, stock, category_id, image_url, barcode }) {
     const [result] = await pool.query(
-      'INSERT INTO products (name, description, price, stock, category_id, image_url) VALUES (?, ?, ?, ?, ?, ?)',
-      [name, description, price, stock, category_id ? parseInt(category_id) : null, image_url]
+      'INSERT INTO products (name, description, price, stock, category_id, image_url, barcode) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [name, description, price, stock, category_id ? parseInt(category_id) : null, image_url, barcode]
     );
     return result.insertId;
   },
 
-  async update(id, { name, description, price, stock, category_id, image_url }) {
+  async update(id, { name, description, price, stock, category_id, image_url, barcode }) {
     const [result] = await pool.query(
-      'UPDATE products SET name = ?, description = ?, price = ?, stock = ?, category_id = ?, image_url = ? WHERE id = ?',
-      [name, description, price, stock, category_id ? parseInt(category_id) : null, image_url, id]
+      'UPDATE products SET name = ?, description = ?, price = ?, stock = ?, category_id = ?, image_url = ?, barcode = ? WHERE id = ?',
+      [name, description, price, stock, category_id ? parseInt(category_id) : null, image_url, barcode, id]
     );
     return result.affectedRows > 0;
   },

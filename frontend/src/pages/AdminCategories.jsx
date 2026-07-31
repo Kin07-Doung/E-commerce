@@ -7,8 +7,10 @@ const CATEGORIES_PER_PAGE = 15;
 const AdminCategories = () => {
   const [categories, setCategories] = useState([]);
   const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
   const [editingId, setEditingId] = useState(null);
   const [editName, setEditName] = useState('');
+  const [editDescription, setEditDescription] = useState('');
   const [error, setError] = useState('');
   const [importing, setImporting] = useState(false);
   const [page, setPage] = useState(1);
@@ -29,8 +31,9 @@ const AdminCategories = () => {
     e.preventDefault();
     setError('');
     try {
-      await api.post('/categories', { name });
+      await api.post('/categories', { name, description });
       setName('');
+      setDescription('');
       loadCategories();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create category');
@@ -40,9 +43,10 @@ const AdminCategories = () => {
   const handleUpdate = async (id) => {
     setError('');
     try {
-      await api.put(`/categories/${id}`, { name: editName });
+      await api.put(`/categories/${id}`, { name: editName, description: editDescription });
       setEditingId(null);
       setEditName('');
+      setEditDescription('');
       loadCategories();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update category');
@@ -124,6 +128,13 @@ const AdminCategories = () => {
             required
             className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           />
+          <input
+            type="text"
+            placeholder="Category description"
+            value={description}
+            onChange={e => setDescription(e.target.value)}
+            className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          />
           <Button type="submit" variant="primary">Add Category</Button>
         </form>
       </div>
@@ -134,6 +145,7 @@ const AdminCategories = () => {
             <tr>
               <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">#</th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Name</th>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Description</th>
               <th className="px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
@@ -153,15 +165,27 @@ const AdminCategories = () => {
                     <span className="text-sm font-medium text-slate-800">{cat.name}</span>
                   )}
                 </td>
+                <td className="px-6 py-4">
+                  {editingId === cat.id ? (
+                    <input
+                      type="text"
+                      value={editDescription}
+                      onChange={e => setEditDescription(e.target.value)}
+                      className="px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    />
+                  ) : (
+                    <span className="text-sm text-slate-600">{cat.description || '-'}</span>
+                  )}
+                </td>
                 <td className="px-6 py-4 text-sm text-right">
                   {editingId === cat.id ? (
                     <div className="flex gap-2 justify-end">
                       <Button variant="textSuccess" size="sm" onClick={() => handleUpdate(cat.id)}>Save</Button>
-                      <Button variant="text" size="sm" onClick={() => { setEditingId(null); setEditName(''); }}>Cancel</Button>
+                      <Button variant="text" size="sm" onClick={() => { setEditingId(null); setEditName(''); setEditDescription(''); }}>Cancel</Button>
                     </div>
                   ) : (
                     <div className="flex gap-3 justify-end">
-                      <Button variant="textPrimary" size="sm" onClick={() => { setEditingId(cat.id); setEditName(cat.name); }}>Edit</Button>
+                      <Button variant="textPrimary" size="sm" onClick={() => { setEditingId(cat.id); setEditName(cat.name); setEditDescription(cat.description || ''); }}>Edit</Button>
                       <Button variant="textDanger" size="sm" onClick={() => handleDelete(cat.id)}>Delete</Button>
                     </div>
                   )}
