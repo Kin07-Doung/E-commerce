@@ -41,9 +41,28 @@ const User = {
     await pool.query('UPDATE users SET password = ?, reset_token = NULL, reset_token_expires = NULL WHERE reset_token = ?', [hashedPassword, token]);
   },
 
-  async comparePassword(plainPassword, hashedPassword) {
-    return bcrypt.compare(plainPassword, hashedPassword);
-  }
-};
+   async comparePassword(plainPassword, hashedPassword) {
+     return bcrypt.compare(plainPassword, hashedPassword);
+   },
+
+   async findAll(page = 1, limit = 20) {
+     const offset = (page - 1) * limit;
+     const [rows] = await pool.query(
+       'SELECT id, name, email, role, provider, created_at FROM users ORDER BY created_at DESC LIMIT ? OFFSET ?',
+       [limit, offset]
+     );
+     return rows;
+   },
+
+   async findAllCount() {
+     const [rows] = await pool.query('SELECT COUNT(*) AS total FROM users');
+     return rows[0].total;
+   },
+
+   async updateRole(id, role) {
+     const [result] = await pool.query('UPDATE users SET role = ? WHERE id = ?', [role, id]);
+     return result.affectedRows > 0;
+   }
+ };
 
 module.exports = User;

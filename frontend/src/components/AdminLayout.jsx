@@ -19,6 +19,7 @@ const AdminLayout = () => {
     { path: '/admin/products', label: 'Products', icon: '📦' },
     { path: '/admin/categories', label: 'Categories', icon: '🏷️' },
     { path: '/admin/orders', label: 'Orders', icon: '📋' },
+    { path: '/admin/users', label: 'Users', icon: '👥' },
   ];
 
   const closeSidebar = () => setSidebarOpen(false);
