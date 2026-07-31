@@ -3,10 +3,12 @@ import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useAlert } from '../context/AlertContext';
+import ProductCard from '../components/ProductCard';
 
 const ProductDetail = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
+  const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const { user } = useAuth();
@@ -16,7 +18,15 @@ const ProductDetail = () => {
     setLoading(true);
     setError('');
     api.get(`/products/${id}`)
-      .then(res => setProduct(res.data))
+      .then(res => {
+        setProduct(res.data);
+        if (res.data.category_id) {
+          api.get('/products').then(pRes => {
+            const all = pRes.data.products || pRes.data;
+            setRelated(all.filter(p => p.category_id === res.data.category_id && p.id !== res.data.id).slice(0, 4));
+          }).catch(() => {});
+        }
+      })
       .catch(() => setError('Product not found'))
       .finally(() => setLoading(false));
   }, [id]);
@@ -65,6 +75,16 @@ const ProductDetail = () => {
           </div>
         </div>
       </div>
+      {related.length > 0 && (
+        <div className="bg-white rounded-xl border border-slate-200 p-6">
+          <h2 className="text-xl font-bold text-slate-800 mb-4">Related Products</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            {related.map(p => (
+              <ProductCard key={p.id} product={p} onAddToCart={addToCart} />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
 
+const statusSteps = ['pending', 'processing', 'shipped', 'delivered'];
+
 const OrderDetail = () => {
   const { id } = useParams();
   const [order, setOrder] = useState(null);
@@ -17,6 +19,9 @@ const OrderDetail = () => {
   if (loading) return <div className="container py-20 text-center">Loading...</div>;
   if (!order) return <div className="container py-20 text-center">Order not found</div>;
 
+  const currentStep = statusSteps.indexOf(order.status);
+  const isCanceled = order.status === 'canceled';
+
   return (
     <div className="space-y-6">
       <Link to="/orders" className="inline-flex items-center text-sm text-slate-500 hover:text-blue-600 font-medium">
@@ -24,21 +29,48 @@ const OrderDetail = () => {
         Back to Orders
       </Link>
       <div className="bg-white rounded-xl border border-slate-200">
-        <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div>
             <h2 className="text-lg font-bold text-slate-800">Order #{order.id}</h2>
             <p className="text-sm text-slate-500 mt-0.5">{new Date(order.created_at).toLocaleDateString()}</p>
           </div>
-          <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${
-            order.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-            order.status === 'processing' ? 'bg-blue-100 text-blue-700' :
-            order.status === 'shipped' ? 'bg-purple-100 text-purple-700' :
-            order.status === 'delivered' ? 'bg-green-100 text-green-700' :
-            'bg-red-100 text-red-700'
-          }`}>
-            {order.status}
-          </span>
+          {isCanceled ? (
+            <span className="px-3 py-1 rounded-full text-xs font-medium capitalize bg-red-100 text-red-700">Canceled</span>
+          ) : (
+            <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${
+              order.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+              order.status === 'processing' ? 'bg-blue-100 text-blue-700' :
+              order.status === 'shipped' ? 'bg-purple-100 text-purple-700' :
+              order.status === 'delivered' ? 'bg-green-100 text-green-700' :
+              'bg-slate-100 text-slate-700'
+            }`}>
+              {order.status}
+            </span>
+          )}
         </div>
+
+        {!isCanceled && (
+          <div className="px-6 py-6 border-b border-slate-200">
+            <div className="flex items-center">
+              {statusSteps.map((step, idx) => (
+                <React.Fragment key={step}>
+                  <div className="flex flex-col items-center">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border-2 ${
+                      idx <= currentStep ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-slate-200 text-slate-400'
+                    }`}>
+                      {idx + 1}
+                    </div>
+                    <p className={`text-xs mt-2 font-medium capitalize ${idx <= currentStep ? 'text-blue-600' : 'text-slate-400'}`}>{step}</p>
+                  </div>
+                  {idx < statusSteps.length - 1 && (
+                    <div className={`flex-1 h-0.5 mx-2 ${idx < currentStep ? 'bg-blue-600' : 'bg-slate-200'}`} />
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="p-6">
           <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Items</h3>
           <div className="space-y-3 mb-6">
@@ -52,7 +84,7 @@ const OrderDetail = () => {
               </div>
             ))}
           </div>
-          <div className="border-t border-slate-200 pt-4 flex justify-between items-center">
+          <div className="border-t border-slate-200 pt-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
             <div>
               <p className="text-sm text-slate-500">Ship to:</p>
               <p className="text-sm text-slate-700">{order.shipping_address}</p>

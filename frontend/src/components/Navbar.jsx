@@ -3,6 +3,7 @@ import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useAlert } from '../context/AlertContext';
 import api from '../services/api';
+import Logo from './Logo';
 import Footer from './Footer';
 import Toast from './ui/Toast';
 
@@ -65,7 +66,7 @@ const Navbar = () => {
     <>
       <nav className="bg-white border-b border-slate-200 sticky top-0 z-50">
         <div className="container flex justify-between items-center h-16">
-          <Link to="/" className="text-xl font-bold text-blue-600">ShopHub</Link>
+          <Logo />
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors"
@@ -93,6 +94,7 @@ const Navbar = () => {
             </Link>
             {user && (
               <>
+                <Link to="/account" onClick={closeMobileMenu} className="text-slate-600 text-sm font-medium hover:text-blue-600 transition-colors">Account</Link>
                 <Link to="/orders" onClick={closeMobileMenu} className="text-slate-600 text-sm font-medium hover:text-blue-600 transition-colors">Orders</Link>
                 {user.role === 'admin' && (
                   <Link to="/admin" onClick={closeMobileMenu} className="bg-slate-900 text-white text-sm px-3 py-1.5 rounded-lg font-medium hover:bg-slate-800 transition-colors">Admin Panel</Link>

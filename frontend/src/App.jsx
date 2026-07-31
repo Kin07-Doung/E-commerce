@@ -14,6 +14,7 @@ const Checkout = lazy(() => import('./pages/Checkout'));
 const OrderConfirmation = lazy(() => import('./pages/OrderConfirmation'));
 const Orders = lazy(() => import('./pages/Orders'));
 const OrderDetail = lazy(() => import('./pages/OrderDetail'));
+const Account = lazy(() => import('./pages/Account'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const AdminPOS = lazy(() => import('./pages/AdminPOS'));
@@ -38,6 +39,7 @@ const App = () => {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/orders" element={<Orders />} />
           <Route path="/orders/:id" element={<OrderDetail />} />
+          <Route path="/account" element={<Account />} />
           <Route path="/order-confirmation/:id" element={<OrderConfirmation />} />
         </Route>
         <Route path="/admin" element={<AdminLayout />}>
