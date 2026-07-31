@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useAlert } from '../context/AlertContext';
 
 const Checkout = () => {
   const [address, setAddress] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { showError } = useAlert();
 
   useEffect(() => {
     if (!user) navigate('/login');
@@ -21,7 +23,7 @@ const Checkout = () => {
       window.dispatchEvent(new Event('cart-updated'));
       navigate(`/order-confirmation/${res.data.id}`);
     } catch (err) {
-      alert(err.response?.data?.message || 'Checkout failed');
+      showError(err.response?.data?.message || 'Checkout failed');
     } finally {
       setSubmitting(false);
     }

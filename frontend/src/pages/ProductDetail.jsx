@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useAlert } from '../context/AlertContext';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -9,6 +10,7 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const { user } = useAuth();
+  const { showError, showSuccess } = useAlert();
 
   useEffect(() => {
     setLoading(true);
@@ -21,15 +23,15 @@ const ProductDetail = () => {
 
   const addToCart = async () => {
     if (!user) {
-      alert('Please login to add items to cart');
+      showError('Please login to add items to cart');
       return;
     }
     try {
       await api.post('/cart', { product_id: product.id, quantity: 1 });
       window.dispatchEvent(new Event('cart-updated'));
-      alert('Added to cart!');
+      showSuccess('Added to cart!');
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to add to cart');
+      showError(err.response?.data?.message || 'Failed to add to cart');
     }
   };
 

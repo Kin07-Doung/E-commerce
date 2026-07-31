@@ -2,29 +2,38 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import Button from '../components/ui/Button';
+import { useAlert } from '../context/AlertContext';
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const { showSuccess, showError } = useAlert();
+
+  const loadOrders = async () => {
+    try {
+      const res = await api.get(`/admin/orders/all?page=${page}&limit=20`);
+      setOrders(res.data.orders || res.data);
+      setTotalPages(res.data.totalPages || 1);
+    } catch (err) {
+      showError('Failed to load orders');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    api.get('/admin/orders/all?page=1&limit=20')
-      .then(res => {
-        setOrders(res.data.orders || res.data);
-        setTotalPages(res.data.totalPages || 1);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
+    loadOrders();
+  }, [page]);
 
   const updateStatus = async (id, status) => {
     try {
       await api.patch(`/admin/orders/${id}/status`, { status });
       setOrders(prev => prev.map(order => order.id === id ? { ...order, status } : order));
+      showSuccess(`Order #${id} status updated to ${status}`);
     } catch (err) {
-      alert('Failed to update status');
+      showError('Failed to update status');
     }
   };
 
@@ -33,8 +42,8 @@ const AdminOrders = () => {
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-slate-800">All Orders</h2>
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden overflow-x-auto">
-        <table className="w-full min-w-[900px]">
+      <div className="bg-white rounded-xl border border-slate-200 overflow-y-auto max-h-[350px] scrollbar-light">
+        <table className="w-full">
           <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">#</th>
@@ -49,7 +58,7 @@ const AdminOrders = () => {
           <tbody className="divide-y divide-slate-200">
             {orders.map((order, index) => (
               <tr key={order.id} className="hover:bg-slate-50">
-                <td className="px-6 py-4 text-sm text-slate-500">{index + 1}</td>
+                <td className="px-6 py-4 text-sm text-slate-500">{(page - 1) * 20 + index + 1}</td>
                 <td className="px-6 py-4 text-sm text-slate-600">{order.shipping_address}</td>
                 <td className="px-6 py-4 text-sm text-slate-600 capitalize">{order.payment_method || 'cash'}</td>
                 <td className="px-6 py-4 text-sm font-semibold text-slate-800">${parseFloat(order.total).toFixed(2)}</td>

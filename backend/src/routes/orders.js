@@ -24,6 +24,9 @@ router.get('/:id', authenticate, async (req, res) => {
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
+    if (order.user_id !== req.user.id) {
+      return res.status(403).json({ message: 'Access denied' });
+    }
     res.json(order);
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
@@ -56,17 +59,6 @@ router.post('/', authenticate, [
     await Cart.clearUserCart(req.user.id);
     const order = await Order.findWithItems(orderId);
     res.status(201).json(order);
-  } catch (err) {
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-router.patch('/:id/status', authenticate, async (req, res) => {
-  try {
-    const { status } = req.body;
-    await Order.updateStatus(req.params.id, status);
-    const order = await Order.findWithItems(req.params.id);
-    res.json(order);
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }

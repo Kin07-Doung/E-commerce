@@ -5,10 +5,16 @@ CREATE TABLE users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   email VARCHAR(255) UNIQUE NOT NULL,
-  password VARCHAR(255) NOT NULL,
+  password VARCHAR(255),
   role ENUM('user', 'admin') DEFAULT 'user',
+  provider ENUM('email', 'google') DEFAULT 'email',
+  google_id VARCHAR(255),
+  reset_token VARCHAR(255),
+  reset_token_expires DATETIME,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  INDEX idx_email (email)
+  INDEX idx_email (email),
+  INDEX idx_google_id (google_id),
+  INDEX idx_reset_token (reset_token)
 );
 
 CREATE TABLE categories (

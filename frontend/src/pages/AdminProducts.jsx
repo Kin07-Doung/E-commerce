@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import Button from '../components/ui/Button';
+import Dropdown from '../components/ui/Dropdown';
+import Modal from '../components/ui/Modal';
+import { useAlert } from '../context/AlertContext';
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
@@ -12,17 +15,29 @@ const AdminProducts = () => {
   const [imagePreview, setImagePreview] = useState('');
   const [imageFile, setImageFile] = useState(null);
   const [importing, setImporting] = useState(false);
+  const [viewProduct, setViewProduct] = useState(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const { showSuccess, showError } = useAlert();
+
+  const loadProducts = async () => {
+    try {
+      const res = await api.get(`/admin/products?page=${page}&limit=20`);
+      const data = res.data;
+      setProducts(data.products || data);
+      setTotalPages(data.totalPages || 1);
+    } catch (err) {
+      showError(err.response?.data?.message || 'Failed to load products');
+    }
+  };
 
   useEffect(() => {
     loadProducts();
+  }, [page]);
+
+  useEffect(() => {
     loadCategories();
   }, []);
-
-  const loadProducts = async () => {
-    const res = await api.get('/admin/products');
-    const data = res.data;
-    setProducts(data.products || data);
-  };
 
   const loadCategories = async () => {
     const res = await api.get('/categories');
@@ -54,7 +69,7 @@ const AdminProducts = () => {
       const url = editingProduct ? `/admin/products/${editingProduct.id}` : '/admin/products';
       const method = editingProduct ? api.put : api.post;
       const response = await method(url, data);
-      alert('Success: ' + (response.data.name || 'Product saved'));
+      showSuccess('Success: ' + (response.data.name || 'Product saved'));
       setShowForm(false);
       setEditingProduct(null);
       setForm({ name: '', description: '', price: '', stock: '', category_id: '', image_url: '', barcode: '' });
@@ -63,7 +78,7 @@ const AdminProducts = () => {
       loadProducts();
     } catch (err) {
       const msg = err.response?.data?.message || err.response?.data?.errors?.map(e => e.msg).join(', ') || 'Operation failed';
-      alert('Error: ' + msg);
+      showError(err.response?.data?.message || err.response?.data?.errors?.map(e => e.msg).join(', ') || 'Operation failed');
       console.error('Product submit error:', err.response || err);
     }
   };
@@ -90,7 +105,16 @@ const AdminProducts = () => {
       await api.delete(`/admin/products/${id}`);
       loadProducts();
     } catch (err) {
-      alert(err.response?.data?.message || 'Delete failed');
+      showError(err.response?.data?.message || 'Delete failed');
+    }
+  };
+
+  const handleView = async (product) => {
+    try {
+      const res = await api.get(`/admin/products/${product.id}`);
+      setViewProduct(res.data);
+    } catch (err) {
+      showError(err.response?.data?.message || 'Failed to load product');
     }
   };
 
@@ -106,7 +130,7 @@ const AdminProducts = () => {
       link.remove();
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      alert(err.response?.data?.message || 'Export failed');
+      showError(err.response?.data?.message || 'Export failed');
     }
   };
 
@@ -118,10 +142,10 @@ const AdminProducts = () => {
       const data = new FormData();
       data.append('file', file);
       const res = await api.post('/admin/import/products', data);
-      alert(`Import complete: ${res.data.imported} imported, ${res.data.failed} failed`);
+      showSuccess(`Import complete: ${res.data.imported} imported, ${res.data.failed} failed`);
       loadProducts();
     } catch (err) {
-      alert(err.response?.data?.message || 'Import failed');
+      showError(err.response?.data?.message || 'Import failed');
     } finally {
       setImporting(false);
       e.target.value = '';
@@ -188,8 +212,8 @@ const AdminProducts = () => {
         </div>
       )}
 
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden overflow-x-auto">
-        <table className="w-full min-w-[900px]">
+      <div className="bg-white rounded-xl border border-slate-200 overflow-y-auto max-h-[350px] scrollbar-light">
+        <table className="w-full">
           <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">#</th>
@@ -204,7 +228,7 @@ const AdminProducts = () => {
           <tbody className="divide-y divide-slate-200">
             {products.map((product, index) => (
               <tr key={product.id} className="hover:bg-slate-50 transition-colors">
-                <td className="px-6 py-4 text-sm text-slate-500">{index + 1}</td>
+                <td className="px-6 py-4 text-sm text-slate-500">{(page - 1) * 20 + index + 1}</td>
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
                     {product.image_url && (
@@ -239,7 +263,7 @@ const AdminProducts = () => {
                             await api.put(`/admin/products/${product.id}`, formData);
                             loadProducts();
                           } catch (err) {
-                            alert(err.response?.data?.message || 'Failed to update stock');
+                            showError(err.response?.data?.message || 'Failed to update stock');
                           }
                         }
                       }}>
@@ -248,17 +272,84 @@ const AdminProducts = () => {
                   </div>
                 </td>
                 <td className="px-6 py-4 text-sm text-right">
-                  <Button variant="textPrimary" className="mr-3" onClick={() => handleEdit(product)}>Edit</Button>
-                  <Button variant="textDanger" onClick={() => handleDelete(product.id)}>Delete</Button>
+                  <Dropdown trigger={<span>⋮</span>}>
+                    <button
+                      onClick={() => handleView(product)}
+                      className="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
+                    >
+                      View
+                    </button>
+                    <button
+                      onClick={() => handleEdit(product)}
+                      className="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(product.id)}
+                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                    >
+                      Delete
+                    </button>
+                  </Dropdown>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      <Modal
+        isOpen={!!viewProduct}
+        onClose={() => setViewProduct(null)}
+        title="Product Details"
+        size="md"
+      >
+        {viewProduct && (
+          <div className="space-y-3 text-sm">
+            <div>
+              <span className="font-medium text-slate-500">ID:</span>
+              <span className="ml-2 text-slate-800">{viewProduct.id}</span>
+            </div>
+            <div>
+              <span className="font-medium text-slate-500">Name:</span>
+              <span className="ml-2 text-slate-800">{viewProduct.name}</span>
+            </div>
+            <div>
+              <span className="font-medium text-slate-500">Category:</span>
+              <span className="ml-2 text-slate-800">{viewProduct.category_name || '-'}</span>
+            </div>
+            <div>
+              <span className="font-medium text-slate-500">Price:</span>
+              <span className="ml-2 text-slate-800">${parseFloat(viewProduct.price).toFixed(2)}</span>
+            </div>
+            <div>
+              <span className="font-medium text-slate-500">Stock:</span>
+              <span className="ml-2 text-slate-800">{viewProduct.stock}</span>
+            </div>
+            <div>
+              <span className="font-medium text-slate-500">Description:</span>
+              <p className="ml-2 text-slate-800 mt-1">{viewProduct.description || 'No description'}</p>
+            </div>
+            {viewProduct.image_url && (
+              <div>
+                <span className="font-medium text-slate-500">Image:</span>
+                <img loading="lazy" src={viewProduct.image_url} alt={viewProduct.name} className="mt-2 h-24 w-24 object-cover rounded-lg border border-slate-200" />
+              </div>
+            )}
+          </div>
+        )}
+      </Modal>
+
+      {totalPages > 1 && (
+        <div className="flex justify-center gap-2">
+          <Button variant="outline" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1}>Previous</Button>
+          <span className="px-4 py-2 text-sm text-slate-500">Page {page} of {totalPages}</span>
+          <Button variant="outline" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages}>Next</Button>
+        </div>
+      )}
     </div>
   );
 };
 
 export default AdminProducts;
-

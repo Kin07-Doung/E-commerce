@@ -10,14 +10,14 @@ const Orders = () => {
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
-    api.get('/orders?page=1&limit=20')
+    api.get(`/orders?page=${page}&limit=20`)
       .then(res => {
         setOrders(res.data.orders || res.data);
         setTotalPages(res.data.totalPages || 1);
       })
       .catch(() => setError('Failed to load orders'))
       .finally(() => setLoading(false));
-  }, []);
+  }, [page]);
 
   if (loading) return <div className="container py-20 text-center">Loading...</div>;
   if (error) return <div className="container py-20 text-center text-red-500">{error}</div>;

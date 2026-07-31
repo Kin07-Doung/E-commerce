@@ -40,7 +40,7 @@ const Order = {
 
       const [result] = await connection.query(
         'INSERT INTO orders (user_id, total, shipping_address, status, payment_method) VALUES (?, ?, ?, ?, ?)',
-        [cashierId || 0, total, shipping_address || 'Walk-in Customer', 'completed', paymentMethod || 'cash']
+        [cashierId, total, shipping_address || 'Walk-in Customer', 'completed', paymentMethod || 'cash']
       );
       const orderId = result.insertId;
 
@@ -68,7 +68,7 @@ const Order = {
   async findByUser(userId, page = 1, limit = 20) {
     const offset = (page - 1) * limit;
     const [rows] = await pool.query(`
-      SELECT o.id, o.user_id, o.total, o.shipping_address, o.status, o.created_at
+      SELECT o.id, o.user_id, o.total, o.shipping_address, o.status, o.payment_method, o.created_at
       FROM orders o
       WHERE o.user_id = ?
       ORDER BY o.created_at DESC
@@ -85,7 +85,7 @@ const Order = {
   async findAll(page = 1, limit = 20) {
     const offset = (page - 1) * limit;
     const [rows] = await pool.query(`
-      SELECT o.id, o.user_id, o.total, o.shipping_address, o.status, o.created_at
+      SELECT o.id, o.user_id, o.total, o.shipping_address, o.status, o.payment_method, o.created_at
       FROM orders o
       ORDER BY o.created_at DESC
       LIMIT ? OFFSET ?
@@ -100,7 +100,7 @@ const Order = {
 
   async findWithItems(id) {
     const [orders] = await pool.query(`
-      SELECT o.id, o.user_id, o.total, o.shipping_address, o.status, o.created_at
+      SELECT o.id, o.user_id, o.total, o.shipping_address, o.status, o.payment_method, o.created_at
       FROM orders o
       WHERE o.id = ?
     `, [id]);
