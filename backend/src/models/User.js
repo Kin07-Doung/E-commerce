@@ -59,10 +59,36 @@ const User = {
      return rows[0].total;
    },
 
-   async updateRole(id, role) {
-     const [result] = await pool.query('UPDATE users SET role = ? WHERE id = ?', [role, id]);
-     return result.affectedRows > 0;
-   }
- };
+    async updateRole(id, role) {
+      const [result] = await pool.query('UPDATE users SET role = ? WHERE id = ?', [role, id]);
+      return result.affectedRows > 0;
+    },
+
+    async update(id, { name, role }) {
+      const [result] = await pool.query('UPDATE users SET name = ? WHERE id = ?', [name, id]);
+      if (role) {
+        await pool.query('UPDATE users SET role = ? WHERE id = ?', [role, id]);
+      }
+      return result.affectedRows > 0;
+    },
+
+    async deleteUser(id, currentUserId) {
+      const [user] = await pool.query('SELECT role FROM users WHERE id = ?', [id]);
+      if (!user[0]) {
+        return { deleted: false, message: 'User not found' };
+      }
+      if (id === currentUserId) {
+        return { deleted: false, message: 'Cannot delete your own account' };
+      }
+      if (user[0].role === 'admin') {
+        const [adminCount] = await pool.query('SELECT COUNT(*) AS total FROM users WHERE role = ?', ['admin']);
+        if (adminCount[0].total <= 1) {
+          return { deleted: false, message: 'Cannot delete the last admin' };
+        }
+      }
+      await pool.query('DELETE FROM users WHERE id = ?', [id]);
+      return { deleted: true };
+    }
+  };
 
 module.exports = User;

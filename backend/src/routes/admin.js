@@ -372,17 +372,49 @@ router.patch('/orders/:id/status', async (req, res) => {
    }
  });
 
- router.get('/users', async (req, res) => {
-   try {
-     const page = parseInt(req.query.page) || 1;
-     const limit = parseInt(req.query.limit) || 20;
-     const users = await User.findAll(page, limit);
-     const total = await User.findAllCount();
-     res.json({ users, total, page, limit, totalPages: Math.ceil(total / limit) });
-   } catch (err) {
-     res.status(500).json({ message: 'Server error' });
-   }
- });
+  router.get('/users', async (req, res) => {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 20;
+      const users = await User.findAll(page, limit);
+      const total = await User.findAllCount();
+      res.json({ users, total, page, limit, totalPages: Math.ceil(total / limit) });
+    } catch (err) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  router.get('/users/:id', async (req, res) => {
+    try {
+      const user = await User.findById(req.params.id);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      res.json(user);
+    } catch (err) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  router.put('/users/:id', async (req, res) => {
+    try {
+      const { name, role } = req.body;
+      if (!name || !role || !['user', 'admin'].includes(role)) {
+        return res.status(400).json({ message: 'Valid name and role are required' });
+      }
+      if (parseInt(req.params.id) === req.user.id) {
+        return res.status(400).json({ message: 'Cannot edit your own account' });
+      }
+      const updated = await User.update(req.params.id, { name, role });
+      if (!updated) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      const user = await User.findById(req.params.id);
+      res.json(user);
+    } catch (err) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
 
  router.patch('/users/:id/role', async (req, res) => {
    try {
@@ -404,4 +436,16 @@ router.patch('/orders/:id/status', async (req, res) => {
    }
  });
 
- module.exports = router;
+  router.delete('/users/:id', async (req, res) => {
+    try {
+      const result = await User.deleteUser(req.params.id, req.user.id);
+      if (!result.deleted) {
+        return res.status(400).json({ message: result.message });
+      }
+      res.json({ message: 'User deleted' });
+    } catch (err) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  module.exports = router;

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import Button from '../components/ui/Button';
+import Dropdown from '../components/ui/Dropdown';
+import Modal from '../components/ui/Modal';
 import { useAlert } from '../context/AlertContext';
 import Alert from '../components/ui/Alert';
-
-const CATEGORIES_PER_PAGE = 15;
 
 const AdminCategories = () => {
   const [categories, setCategories] = useState([]);
@@ -15,17 +15,22 @@ const AdminCategories = () => {
   const [importing, setImporting] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [viewCategory, setViewCategory] = useState(null);
   const { showSuccess, showError } = useAlert();
 
   useEffect(() => {
     loadCategories();
-  }, []);
+  }, [page]);
 
   const loadCategories = async () => {
-    const res = await api.get('/categories');
-    const data = res.data;
-    setCategories(data.categories || data);
-    setTotalPages(data.totalPages || 1);
+    try {
+      const res = await api.get(`/categories?page=${page}&limit=20`);
+      const data = res.data;
+      setCategories(data.categories || data);
+      setTotalPages(data.totalPages || 1);
+    } catch (err) {
+      showError('Failed to load categories');
+    }
   };
 
   const handleCreate = async (e) => {
@@ -59,6 +64,15 @@ const AdminCategories = () => {
       loadCategories();
     } catch (err) {
       showError(err.response?.data?.message || 'Failed to delete category');
+    }
+  };
+
+  const handleView = async (cat) => {
+    try {
+      const res = await api.get(`/categories/${cat.id}`);
+      setViewCategory(res.data);
+    } catch (err) {
+      showError(err.response?.data?.message || 'Failed to load category');
     }
   };
 
@@ -96,12 +110,6 @@ const AdminCategories = () => {
     }
   };
 
-  const paginated = categories.slice((page - 1) * CATEGORIES_PER_PAGE, page * CATEGORIES_PER_PAGE);
-
-  useEffect(() => {
-    setPage(1);
-  }, [categories.length]);
-
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
@@ -131,8 +139,8 @@ const AdminCategories = () => {
         </form>
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden overflow-x-auto">
-        <table className="w-full min-w-[600px]">
+      <div className="bg-white rounded-xl border border-slate-200 overflow-y-auto max-h-[350px] scrollbar-light">
+        <table className="w-full">
           <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">#</th>
@@ -141,9 +149,9 @@ const AdminCategories = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
-            {paginated.map((cat, index) => (
+            {categories.map((cat, index) => (
               <tr key={cat.id} className="hover:bg-slate-50 transition-colors">
-                <td className="px-6 py-4 text-sm text-slate-500">{index + 1}</td>
+                <td className="px-6 py-4 text-sm text-slate-500">{(page - 1) * 20 + index + 1}</td>
                 <td className="px-6 py-4">
                   {editingId === cat.id ? (
                     <input
@@ -163,10 +171,26 @@ const AdminCategories = () => {
                       <Button variant="text" size="sm" onClick={() => { setEditingId(null); setEditName(''); }}>Cancel</Button>
                     </div>
                   ) : (
-                    <div className="flex gap-3 justify-end">
-                      <Button variant="textPrimary" size="sm" onClick={() => { setEditingId(cat.id); setEditName(cat.name); }}>Edit</Button>
-                      <Button variant="textDanger" size="sm" onClick={() => handleDelete(cat.id)}>Delete</Button>
-                    </div>
+                    <Dropdown trigger={<span>⋮</span>}>
+                      <button
+                        onClick={() => handleView(cat)}
+                        className="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
+                      >
+                        View
+                      </button>
+                      <button
+                        onClick={() => { setEditingId(cat.id); setEditName(cat.name); }}
+                        className="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(cat.id)}
+                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                      >
+                        Delete
+                      </button>
+                    </Dropdown>
                   )}
                 </td>
               </tr>
@@ -186,6 +210,26 @@ const AdminCategories = () => {
           <Button variant="outline" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages}>Next</Button>
         </div>
       )}
+
+      <Modal
+        isOpen={!!viewCategory}
+        onClose={() => setViewCategory(null)}
+        title="Category Details"
+        size="md"
+      >
+        {viewCategory && (
+          <div className="space-y-3 text-sm">
+            <div>
+              <span className="font-medium text-slate-500">ID:</span>
+              <span className="ml-2 text-slate-800">{viewCategory.id}</span>
+            </div>
+            <div>
+              <span className="font-medium text-slate-500">Name:</span>
+              <span className="ml-2 text-slate-800">{viewCategory.name}</span>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };
