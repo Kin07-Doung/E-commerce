@@ -452,4 +452,70 @@ router.patch('/orders/:id/status', async (req, res) => {
     }
   });
 
+  router.get('/notifications', async (req, res) => {
+    try {
+      const [recentOrders, lowStock, recentUsers] = await Promise.all([
+        Order.findAll(1, 5),
+        Product.findAll(1, 1000),
+        User.findAll(1, 5)
+      ]);
+
+      const notifications = [];
+
+      recentOrders.forEach(order => {
+        notifications.push({
+          id: `order-${order.id}`,
+          type: 'order',
+          text: `New order #${order.id} received`,
+          time: new Date(order.created_at).toLocaleString('en-US', { 
+            month: 'short', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          }),
+          icon: '📦',
+          color: 'text-blue-600'
+        });
+      });
+
+      const stockAlerts = lowStock.filter(p => p.stock < 10).slice(0, 5);
+      stockAlerts.forEach(product => {
+        notifications.push({
+          id: `stock-${product.id}`,
+          type: 'stock',
+          text: `Low stock: ${product.name} (${product.stock} left)`,
+          time: 'Stock alert',
+          icon: '⚠️',
+          color: 'text-amber-600'
+        });
+      });
+
+      recentUsers.forEach(user => {
+        notifications.push({
+          id: `user-${user.id}`,
+          type: 'user',
+          text: `New customer registered: ${user.name}`,
+          time: new Date(user.created_at).toLocaleString('en-US', { 
+            month: 'short', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          }),
+          icon: '👤',
+          color: 'text-purple-600'
+        });
+      });
+
+      notifications.sort((a, b) => {
+        if (a.time === 'Stock alert') return 1;
+        if (b.time === 'Stock alert') return -1;
+        return 0;
+      });
+
+      res.json({ notifications: notifications.slice(0, 10) });
+    } catch (err) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
   module.exports = router;

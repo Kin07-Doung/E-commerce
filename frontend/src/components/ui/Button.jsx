@@ -1,18 +1,18 @@
 import React from 'react';
 
 const Button = ({ children, variant = 'primary', size = 'md', className = '', ...props }) => {
-  const base = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed';
+  const base = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed';
 
   const variants = {
-    primary: 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm',
+    primary: 'bg-brand-600 text-white hover:bg-brand-700 shadow-sm',
     secondary: 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50',
     success: 'bg-green-600 text-white hover:bg-green-700 shadow-sm',
-    warning: 'bg-orange-600 text-white hover:bg-orange-700 shadow-sm',
+    warning: 'bg-brand-600 text-white hover:bg-brand-700 shadow-sm',
     danger: 'bg-red-600 text-white hover:bg-red-700 shadow-sm',
     ghost: 'text-slate-600 hover:text-slate-800 hover:bg-slate-100',
     outline: 'border border-slate-200 text-slate-700 hover:bg-slate-50',
     text: 'text-slate-600 hover:text-slate-800',
-    textPrimary: 'text-blue-600 hover:text-blue-700',
+    textPrimary: 'text-brand-600 hover:text-brand-700',
     textDanger: 'text-red-600 hover:text-red-700',
     textSuccess: 'text-green-600 hover:text-green-700',
     sidebar: 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white',

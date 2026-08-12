@@ -44,6 +44,29 @@ const AdminProducts = () => {
     setCategories(res.data.categories || res.data);
   };
 
+  const getCategoryEmoji = (categoryName) => {
+    const emojis = {
+      'bakery': '🍞',
+      'dairy': '🥛',
+      'meat': '🥩',
+      'seafood': '🐟',
+      'fruits': '🍎',
+      'vegetables': '🥬',
+      'organic': '🌿',
+      'fresh': '✨',
+      'seasonal': '🍂',
+      'spices': '🌶️',
+      'beverages': '🥤',
+      'snacks': '🍿'
+    };
+    if (!categoryName) return '🏷️';
+    const lowerName = categoryName.toLowerCase();
+    for (const [key, emoji] of Object.entries(emojis)) {
+      if (lowerName.includes(key)) return emoji;
+    }
+    return '🏷️';
+  };
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -69,7 +92,7 @@ const AdminProducts = () => {
       const url = editingProduct ? `/admin/products/${editingProduct.id}` : '/admin/products';
       const method = editingProduct ? api.put : api.post;
       const response = await method(url, data);
-      showSuccess('Success: ' + (response.data.name || 'Product saved'));
+      showSuccess(`✅ ${editingProduct ? 'Updated' : 'Added'} product "${response.data.name || form.name}" successfully!`);
       setShowForm(false);
       setEditingProduct(null);
       setForm({ name: '', description: '', price: '', stock: '', category_id: '', image_url: '', barcode: '' });
@@ -78,7 +101,7 @@ const AdminProducts = () => {
       loadProducts();
     } catch (err) {
       const msg = err.response?.data?.message || err.response?.data?.errors?.map(e => e.msg).join(', ') || 'Operation failed';
-      showError(err.response?.data?.message || err.response?.data?.errors?.map(e => e.msg).join(', ') || 'Operation failed');
+      showError(msg);
       console.error('Product submit error:', err.response || err);
     }
   };
@@ -100,10 +123,11 @@ const AdminProducts = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this product?')) return;
+    if (!confirm('🗑️ Are you sure you want to delete this product?')) return;
     try {
       await api.delete(`/admin/products/${id}`);
       loadProducts();
+      showSuccess('🗑️ Product deleted successfully');
     } catch (err) {
       showError(err.response?.data?.message || 'Delete failed');
     }
@@ -129,6 +153,7 @@ const AdminProducts = () => {
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
+      showSuccess('📥 Products exported successfully!');
     } catch (err) {
       showError(err.response?.data?.message || 'Export failed');
     }
@@ -142,7 +167,7 @@ const AdminProducts = () => {
       const data = new FormData();
       data.append('file', file);
       const res = await api.post('/admin/import/products', data);
-      showSuccess(`Import complete: ${res.data.imported} imported, ${res.data.failed} failed`);
+      showSuccess(`📥 Import complete: ${res.data.imported} imported, ${res.data.failed} failed`);
       loadProducts();
     } catch (err) {
       showError(err.response?.data?.message || 'Import failed');
@@ -154,200 +179,347 @@ const AdminProducts = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-        <h2 className="text-2xl font-bold text-slate-800">Products</h2>
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 bg-gradient-to-r from-orange-50 to-amber-50 p-6 rounded-2xl border-2 border-orange-200">
+        <div className="flex items-center gap-3">
+          <div className="p-3 bg-orange-100 rounded-xl">
+            <span className="text-2xl">🍽️</span>
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800">Products</h2>
+            <p className="text-sm text-gray-500">Manage your food inventory</p>
+          </div>
+        </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="success" onClick={handleExport}>Export CSV</Button>
-          <label className="bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-orange-700 shadow-sm cursor-pointer">
-            Import CSV
+          <button 
+            onClick={handleExport} 
+            className="bg-white text-orange-600 border-2 border-orange-200 px-4 py-2 rounded-xl text-sm font-medium hover:bg-orange-50 hover:border-orange-300 transition-all duration-200 shadow-sm flex items-center gap-2"
+          >
+            <span>📥</span> Export CSV
+          </button>
+          <label className="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-4 py-2 rounded-xl text-sm font-medium hover:from-orange-600 hover:to-amber-600 transition-all duration-200 shadow-md hover:shadow-lg active:scale-95 cursor-pointer flex items-center gap-2">
+            <span>📤</span> Import CSV
             <input type="file" accept=".csv" onChange={handleImport} className="hidden" disabled={importing} />
           </label>
-          <Button variant="primary" onClick={() => { setShowForm(true); setEditingProduct(null); setForm({ name: '', description: '', price: '', stock: '', category_id: '', image_url: '', barcode: '' }); setImagePreview(''); setImageFile(null); }}>+ Add Product</Button>
+          <button 
+            onClick={() => { setShowForm(true); setEditingProduct(null); setForm({ name: '', description: '', price: '', stock: '', category_id: '', image_url: '', barcode: '' }); setImagePreview(''); setImageFile(null); }} 
+            className="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-4 py-2 rounded-xl text-sm font-medium hover:from-orange-600 hover:to-amber-600 transition-all duration-200 shadow-md hover:shadow-lg active:scale-95 flex items-center gap-2"
+          >
+            <span>➕</span> Add Product
+          </button>
         </div>
       </div>
 
+      {/* Product Form */}
       {showForm && (
-        <div className="bg-white rounded-xl border border-slate-200 p-6">
-          <h3 className="text-lg font-bold text-slate-800 mb-4">{editingProduct ? 'Edit Product' : 'New Product'}</h3>
+        <div className="bg-white rounded-2xl border-2 border-orange-200 p-6 shadow-lg">
+          <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <span className="text-2xl">{editingProduct ? '✏️' : '➕'}</span>
+            {editingProduct ? 'Edit Product' : 'Add New Product'}
+          </h3>
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1.5">Product Name</label>
-              <input type="text" placeholder="Name" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+              <label className="flex items-center gap-1 text-xs font-semibold text-gray-600 mb-1.5">
+                <span>📦</span> Product Name
+                <span className="text-red-500">*</span>
+              </label>
+              <input 
+                type="text" 
+                placeholder="e.g., Organic Bread" 
+                value={form.name} 
+                onChange={e => setForm({...form, name: e.target.value})} 
+                required 
+                className="w-full px-4 py-2.5 bg-orange-50/50 border-2 border-orange-200 rounded-xl text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200 placeholder:text-gray-400"
+              />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1.5">Category</label>
-              <select value={form.category_id} onChange={e => setForm({...form, category_id: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+              <label className="flex items-center gap-1 text-xs font-semibold text-gray-600 mb-1.5">
+                <span>🏷️</span> Category
+              </label>
+              <select 
+                value={form.category_id} 
+                onChange={e => setForm({...form, category_id: e.target.value})} 
+                className="w-full px-4 py-2.5 bg-orange-50/50 border-2 border-orange-200 rounded-xl text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200"
+              >
                 <option value="">Select Category</option>
-                {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
+                {categories.map(cat => (
+                  <option key={cat.id} value={cat.id}>
+                    {getCategoryEmoji(cat.name)} {cat.name}
+                  </option>
+                ))}
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1.5">Price ($)</label>
-              <input type="number" step="0.01" placeholder="0.00" value={form.price} onChange={e => setForm({...form, price: e.target.value})} required className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+              <label className="flex items-center gap-1 text-xs font-semibold text-gray-600 mb-1.5">
+                <span>💰</span> Price ($)
+                <span className="text-red-500">*</span>
+              </label>
+              <input 
+                type="number" 
+                step="0.01" 
+                placeholder="0.00" 
+                value={form.price} 
+                onChange={e => setForm({...form, price: e.target.value})} 
+                required 
+                className="w-full px-4 py-2.5 bg-orange-50/50 border-2 border-orange-200 rounded-xl text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200 placeholder:text-gray-400"
+              />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1.5">Stock Qty</label>
-              <input type="number" placeholder="0" value={form.stock} onChange={e => setForm({...form, stock: e.target.value})} required className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+              <label className="flex items-center gap-1 text-xs font-semibold text-gray-600 mb-1.5">
+                <span>📊</span> Stock Quantity
+                <span className="text-red-500">*</span>
+              </label>
+              <input 
+                type="number" 
+                placeholder="0" 
+                value={form.stock} 
+                onChange={e => setForm({...form, stock: e.target.value})} 
+                required 
+                className="w-full px-4 py-2.5 bg-orange-50/50 border-2 border-orange-200 rounded-xl text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200 placeholder:text-gray-400"
+              />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-xs font-medium text-slate-500 mb-1.5">Product Image</label>
-              <input type="file" accept="image/*" onChange={handleImageChange} className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
-              {(imagePreview || form.image_url) && (
-                 <img loading="lazy" src={imagePreview || form.image_url} alt="Preview" className="mt-3 h-24 w-24 object-cover rounded-lg border border-slate-200" />
-              )}
+              <label className="flex items-center gap-1 text-xs font-semibold text-gray-600 mb-1.5">
+                <span>📷</span> Product Image
+              </label>
+              <div className="flex items-center gap-4 flex-wrap">
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={handleImageChange} 
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-orange-50 file:text-orange-600 hover:file:bg-orange-100 file:cursor-pointer"
+                />
+                {(imagePreview || form.image_url) && (
+                  <img loading="lazy" src={imagePreview || form.image_url} alt="Preview" className="h-20 w-20 object-cover rounded-xl border-2 border-orange-200" />
+                )}
+              </div>
             </div>
             <div className="md:col-span-2">
-              <label className="block text-xs font-medium text-slate-500 mb-1.5">Barcode</label>
-              <input type="text" placeholder="Product barcode..." value={form.barcode} onChange={e => setForm({...form, barcode: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+              <label className="flex items-center gap-1 text-xs font-semibold text-gray-600 mb-1.5">
+                <span>📱</span> Barcode
+              </label>
+              <input 
+                type="text" 
+                placeholder="Product barcode..." 
+                value={form.barcode} 
+                onChange={e => setForm({...form, barcode: e.target.value})} 
+                className="w-full px-4 py-2.5 bg-orange-50/50 border-2 border-orange-200 rounded-xl text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200 placeholder:text-gray-400"
+              />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-xs font-medium text-slate-500 mb-1.5">Description</label>
-              <textarea placeholder="Product description..." value={form.description} onChange={e => setForm({...form, description: e.target.value})} rows={3} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-y" />
+              <label className="flex items-center gap-1 text-xs font-semibold text-gray-600 mb-1.5">
+                <span>📝</span> Description
+              </label>
+              <textarea 
+                placeholder="Product description..." 
+                value={form.description} 
+                onChange={e => setForm({...form, description: e.target.value})} 
+                rows={3} 
+                className="w-full px-4 py-2.5 bg-orange-50/50 border-2 border-orange-200 rounded-xl text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200 placeholder:text-gray-400 resize-y"
+              />
             </div>
             <div className="md:col-span-2 flex gap-3 pt-2">
-              <Button type="submit" variant="primary" size="lg">{editingProduct ? 'Update Product' : 'Create Product'}</Button>
-              <Button type="button" variant="secondary" size="lg" onClick={() => { setShowForm(false); setEditingProduct(null); setImagePreview(''); setImageFile(null); }}>Cancel</Button>
+              <button 
+                type="submit" 
+                className="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:from-orange-600 hover:to-amber-600 transition-all duration-200 shadow-md hover:shadow-lg active:scale-95"
+              >
+                {editingProduct ? '💾 Update Product' : '➕ Create Product'}
+              </button>
+              <button 
+                type="button" 
+                className="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border-2 border-orange-200 rounded-xl hover:bg-orange-50 hover:border-orange-300 transition-all duration-200"
+                onClick={() => { setShowForm(false); setEditingProduct(null); setImagePreview(''); setImageFile(null); }}
+              >
+                ✖ Cancel
+              </button>
             </div>
           </form>
         </div>
       )}
 
-      <div className="bg-white rounded-xl border border-slate-200 overflow-y-auto max-h-[350px] scrollbar-light">
-        <table className="w-full">
-          <thead className="bg-slate-50 border-b border-slate-200">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">#</th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Product</th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Barcode</th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Category</th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Price</th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Stock</th>
-              <th className="px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-200">
-            {products.map((product, index) => (
-              <tr key={product.id} className="hover:bg-slate-50 transition-colors">
-                <td className="px-6 py-4 text-sm text-slate-500">{(page - 1) * 20 + index + 1}</td>
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    {product.image_url && (
-                      <img loading="lazy" src={product.image_url} alt={product.name} className="w-10 h-10 rounded-lg object-cover border border-slate-200" />
-                    )}
-                    <div>
-                      <span className="text-sm font-medium text-slate-800">{product.name}</span>
-                      <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">{product.description || ''}</p>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 text-sm font-medium text-slate-800">{product.barcode || '-'}</td>
-                <td className="px-6 py-4 text-sm text-slate-600">{product.category_name || '-'}</td>
-                <td className="px-6 py-4 text-sm font-medium text-slate-800">${parseFloat(product.price).toFixed(2)}</td>
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-2">
-                    <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${product.stock < 10 ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
-                      {product.stock}
-                    </span>
-                    <Button variant="textPrimary" size="sm" className="text-xs" onClick={async () => {
-                        const newStock = prompt('Enter new stock quantity:', product.stock);
-                        if (newStock !== null && !isNaN(newStock)) {
-                          try {
-                            const formData = new FormData();
-                            formData.append('name', product.name);
-                            formData.append('description', product.description || '');
-                            formData.append('price', product.price.toString());
-                            formData.append('stock', parseInt(newStock).toString());
-                            formData.append('category_id', product.category_id?.toString() || '');
-                            formData.append('image_url', product.image_url || '');
-                            formData.append('barcode', product.barcode || '');
-                            await api.put(`/admin/products/${product.id}`, formData);
-                            loadProducts();
-                          } catch (err) {
-                            showError(err.response?.data?.message || 'Failed to update stock');
-                          }
-                        }
-                      }}>
-                      Edit
-                    </Button>
-                  </div>
-                </td>
-                <td className="px-6 py-4 text-sm text-right">
-                  <Dropdown trigger={<span>⋮</span>}>
-                    <button
-                      onClick={() => handleView(product)}
-                      className="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
-                    >
-                      View
-                    </button>
-                    <button
-                      onClick={() => handleEdit(product)}
-                      className="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(product.id)}
-                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                    >
-                      Delete
-                    </button>
-                  </Dropdown>
-                </td>
+      {/* Products Table */}
+      <div className="bg-white rounded-2xl border-2 border-orange-200 overflow-hidden shadow-lg">
+        <div className="overflow-x-auto max-h-[450px] scrollbar-thin scrollbar-thumb-orange-200 scrollbar-track-orange-50">
+          <table className="w-full">
+            <thead className="bg-gradient-to-r from-orange-50 to-amber-50 border-b-2 border-orange-200 sticky top-0 z-10">
+              <tr>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">#</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Product</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Barcode</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Category</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Price</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Stock</th>
+                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-orange-100">
+              {products.map((product, index) => (
+                <tr key={product.id} className="hover:bg-orange-50/50 transition-colors duration-150 group">
+                  <td className="px-6 py-4 text-sm text-gray-500">{(page - 1) * 20 + index + 1}</td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      {product.image_url ? (
+                        <img loading="lazy" src={product.image_url} alt={product.name} className="w-12 h-12 rounded-xl object-cover border-2 border-orange-200" />
+                      ) : (
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-100 to-amber-100 flex items-center justify-center border-2 border-orange-200">
+                          <span className="text-2xl">🍽️</span>
+                        </div>
+                      )}
+                      <div>
+                        <span className="text-sm font-semibold text-gray-800 group-hover:text-orange-600 transition-colors">{product.name}</span>
+                        <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">{product.description || ''}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-sm font-mono text-gray-600">{product.barcode || '-'}</td>
+                  <td className="px-6 py-4">
+                    <span className="flex items-center gap-1.5 text-sm text-gray-600">
+                      <span>{getCategoryEmoji(product.category_name)}</span>
+                      {product.category_name || '-'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-sm font-bold text-orange-600">${parseFloat(product.price).toFixed(2)}</td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-2">
+                      <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold ${
+                        product.stock < 10 && product.stock > 0 ? 'bg-amber-100 text-amber-700' :
+                        product.stock === 0 ? 'bg-red-100 text-red-700' :
+                        'bg-green-100 text-green-700'
+                      }`}>
+                        {product.stock < 10 && product.stock > 0 && '⚠️ '}
+                        {product.stock === 0 && '❌ '}
+                        {product.stock}
+                      </span>
+                      {product.stock < 10 && product.stock > 0 && (
+                        <span className="text-xs text-amber-500 animate-pulse">Low stock!</span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-right">
+                    <Dropdown 
+                      trigger={
+                        <button className="p-2 hover:bg-orange-100 rounded-lg transition-colors">
+                          <span className="text-xl">⋮</span>
+                        </button>
+                      }
+                    >
+                      <button
+                        onClick={() => handleView(product)}
+                        className="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-orange-50 transition-colors flex items-center gap-2"
+                      >
+                        <span>👁️</span> View
+                      </button>
+                      <button
+                        onClick={() => handleEdit(product)}
+                        className="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-orange-50 transition-colors flex items-center gap-2"
+                      >
+                        <span>✏️</span> Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(product.id)}
+                        className="block w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
+                      >
+                        <span>🗑️</span> Delete
+                      </button>
+                    </Dropdown>
+                  </td>
+                </tr>
+              ))}
+              {products.length === 0 && (
+                <tr>
+                  <td colSpan="7" className="px-6 py-12 text-center">
+                    <div className="flex flex-col items-center gap-2">
+                      <span className="text-6xl">🍽️</span>
+                      <p className="text-gray-500 font-medium">No products yet</p>
+                      <p className="text-sm text-gray-400">Add your first product to get started</p>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center gap-2 items-center bg-white rounded-2xl border-2 border-orange-200 p-4 shadow-lg">
+          <button 
+            onClick={() => setPage(p => Math.max(1, p - 1))} 
+            disabled={page <= 1}
+            className="px-4 py-2 text-sm font-medium text-orange-600 border-2 border-orange-200 rounded-xl hover:bg-orange-50 hover:border-orange-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+          >
+            ← Previous
+          </button>
+          <div className="flex items-center gap-2 px-4 py-2 bg-orange-50 rounded-xl border border-orange-200">
+            <span className="text-sm font-medium text-gray-700">Page</span>
+            <span className="text-sm font-bold text-orange-600">{page}</span>
+            <span className="text-sm text-gray-500">of {totalPages}</span>
+          </div>
+          <button 
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))} 
+            disabled={page >= totalPages}
+            className="px-4 py-2 text-sm font-medium text-orange-600 border-2 border-orange-200 rounded-xl hover:bg-orange-50 hover:border-orange-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+          >
+            Next →
+          </button>
+        </div>
+      )}
+
+      {/* View Product Modal */}
       <Modal
         isOpen={!!viewProduct}
         onClose={() => setViewProduct(null)}
-        title="Product Details"
+        title={
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">👁️</span>
+            <span className="text-xl font-bold text-gray-800">Product Details</span>
+          </div>
+        }
         size="md"
       >
         {viewProduct && (
-          <div className="space-y-3 text-sm">
-            <div>
-              <span className="font-medium text-slate-500">ID:</span>
-              <span className="ml-2 text-slate-800">{viewProduct.id}</span>
-            </div>
-            <div>
-              <span className="font-medium text-slate-500">Name:</span>
-              <span className="ml-2 text-slate-800">{viewProduct.name}</span>
-            </div>
-            <div>
-              <span className="font-medium text-slate-500">Category:</span>
-              <span className="ml-2 text-slate-800">{viewProduct.category_name || '-'}</span>
-            </div>
-            <div>
-              <span className="font-medium text-slate-500">Price:</span>
-              <span className="ml-2 text-slate-800">${parseFloat(viewProduct.price).toFixed(2)}</span>
-            </div>
-            <div>
-              <span className="font-medium text-slate-500">Stock:</span>
-              <span className="ml-2 text-slate-800">{viewProduct.stock}</span>
-            </div>
-            <div>
-              <span className="font-medium text-slate-500">Description:</span>
-              <p className="ml-2 text-slate-800 mt-1">{viewProduct.description || 'No description'}</p>
-            </div>
-            {viewProduct.image_url && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl border-2 border-orange-200">
+              {viewProduct.image_url ? (
+                <img loading="lazy" src={viewProduct.image_url} alt={viewProduct.name} className="w-20 h-20 rounded-xl object-cover border-2 border-orange-200" />
+              ) : (
+                <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-orange-100 to-amber-100 flex items-center justify-center border-2 border-orange-200">
+                  <span className="text-4xl">🍽️</span>
+                </div>
+              )}
               <div>
-                <span className="font-medium text-slate-500">Image:</span>
-                <img loading="lazy" src={viewProduct.image_url} alt={viewProduct.name} className="mt-2 h-24 w-24 object-cover rounded-lg border border-slate-200" />
+                <h3 className="text-lg font-bold text-gray-800">{viewProduct.name}</h3>
+                <span className="inline-flex items-center gap-1 text-sm text-orange-600">
+                  {getCategoryEmoji(viewProduct.category_name)} {viewProduct.category_name || 'Uncategorized'}
+                </span>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 bg-white rounded-xl border border-orange-200">
+                <p className="text-xs text-gray-500">Price</p>
+                <p className="text-lg font-bold text-orange-600">${parseFloat(viewProduct.price).toFixed(2)}</p>
+              </div>
+              <div className="p-4 bg-white rounded-xl border border-orange-200">
+                <p className="text-xs text-gray-500">Stock</p>
+                <p className={`text-lg font-bold ${viewProduct.stock < 10 ? 'text-amber-600' : 'text-green-600'}`}>
+                  {viewProduct.stock} units
+                </p>
+              </div>
+            </div>
+            <div className="p-4 bg-white rounded-xl border border-orange-200">
+              <p className="text-xs text-gray-500">Barcode</p>
+              <p className="text-sm font-mono text-gray-700">{viewProduct.barcode || 'No barcode'}</p>
+            </div>
+            {viewProduct.description && (
+              <div className="p-4 bg-white rounded-xl border border-orange-200">
+                <p className="text-xs text-gray-500">Description</p>
+                <p className="text-sm text-gray-700 mt-1">{viewProduct.description}</p>
               </div>
             )}
           </div>
         )}
       </Modal>
-
-      {totalPages > 1 && (
-        <div className="flex justify-center gap-2">
-          <Button variant="outline" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1}>Previous</Button>
-          <span className="px-4 py-2 text-sm text-slate-500">Page {page} of {totalPages}</span>
-          <Button variant="outline" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages}>Next</Button>
-        </div>
-      )}
     </div>
   );
 };

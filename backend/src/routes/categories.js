@@ -31,7 +31,8 @@ router.get('/:id', async (req, res) => {
 
   router.post('/', authenticate, authorizeAdmin, [
   body('name').notEmpty().withMessage('Name is required'),
-  body('description').optional().isString().withMessage('Description must be a string')
+  body('description').optional().isString().withMessage('Description must be a string'),
+  body('icon').optional().isString().withMessage('Icon must be a string')
 ], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -39,8 +40,8 @@ router.get('/:id', async (req, res) => {
   }
 
   try {
-    const { name, description } = req.body;
-    const categoryId = await Category.create({ name, description });
+    const { name, description, icon } = req.body;
+    const categoryId = await Category.create({ name, description, icon: icon || '🏷️' });
     const category = await Category.findById(categoryId);
     res.status(201).json(category);
   } catch (err) {
@@ -53,7 +54,8 @@ router.get('/:id', async (req, res) => {
 
   router.put('/:id', authenticate, authorizeAdmin, [
   body('name').notEmpty().withMessage('Name is required'),
-  body('description').optional().isString().withMessage('Description must be a string')
+  body('description').optional().isString().withMessage('Description must be a string'),
+  body('icon').optional().isString().withMessage('Icon must be a string')
 ], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -61,10 +63,10 @@ router.get('/:id', async (req, res) => {
   }
 
   try {
-    const { name, description } = req.body;
+    const { name, description, icon } = req.body;
     const [result] = await require('../config/db').query(
-      'UPDATE categories SET name = ?, description = ? WHERE id = ?',
-      [name, description, req.params.id]
+      'UPDATE categories SET name = ?, description = ?, icon = ? WHERE id = ?',
+      [name, description, icon || '🏷️', req.params.id]
     );
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'Category not found' });

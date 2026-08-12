@@ -19,7 +19,12 @@ const User = {
   },
 
   async findById(id) {
-    const [rows] = await pool.query('SELECT id, name, email, role, provider, created_at FROM users WHERE id = ?', [id]);
+    const [rows] = await pool.query('SELECT id, name, email, phone, role, provider, created_at FROM users WHERE id = ?', [id]);
+    return rows[0];
+  },
+
+  async findByIdWithPassword(id) {
+    const [rows] = await pool.query('SELECT * FROM users WHERE id = ?', [id]);
     return rows[0];
   },
 
@@ -64,13 +69,42 @@ const User = {
       return result.affectedRows > 0;
     },
 
-    async update(id, { name, role }) {
-      const [result] = await pool.query('UPDATE users SET name = ? WHERE id = ?', [name, id]);
-      if (role) {
-        await pool.query('UPDATE users SET role = ? WHERE id = ?', [role, id]);
-      }
-      return result.affectedRows > 0;
-    },
+  async update(id, { name, role }) {
+    const [result] = await pool.query('UPDATE users SET name = ? WHERE id = ?', [name, id]);
+    if (role) {
+      await pool.query('UPDATE users SET role = ? WHERE id = ?', [role, id]);
+    }
+    return result.affectedRows > 0;
+  },
+
+  async updateProfile(id, { name, email, phone }) {
+    const fields = [];
+    const params = [];
+    if (name !== undefined) {
+      fields.push('name = ?');
+      params.push(name);
+    }
+    if (email !== undefined) {
+      fields.push('email = ?');
+      params.push(email);
+    }
+    if (phone !== undefined) {
+      fields.push('phone = ?');
+      params.push(phone);
+    }
+    if (fields.length === 0) {
+      return false;
+    }
+    params.push(id);
+    const [result] = await pool.query(`UPDATE users SET ${fields.join(', ')} WHERE id = ?`, params);
+    return result.affectedRows > 0;
+  },
+
+  async updatePassword(id, password) {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const [result] = await pool.query('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, id]);
+    return result.affectedRows > 0;
+  },
 
     async deleteUser(id, currentUserId) {
       const [user] = await pool.query('SELECT role FROM users WHERE id = ?', [id]);

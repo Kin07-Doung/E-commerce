@@ -5,7 +5,7 @@ const Toast = ({ message, type, onClose }) => {
     success: 'bg-green-600',
     error: 'bg-red-600',
     warning: 'bg-orange-600',
-    info: 'bg-blue-600',
+    info: 'bg-brand-600',
   };
 
   const typeIcons = {

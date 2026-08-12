@@ -49,6 +49,19 @@ export const AuthProvider = ({ children }) => {
     return user;
   };
 
+  const updateProfile = async (name, email, phone) => {
+    const response = await api.put('/user/profile', { name, email, phone });
+    const updatedUser = response.data;
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    setUser(updatedUser);
+    return updatedUser;
+  };
+
+  const updatePassword = async (currentPassword, newPassword) => {
+    const response = await api.put('/user/password', { currentPassword, newPassword });
+    return response.data;
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -57,7 +70,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, googleSignIn, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, register, googleSignIn, updateProfile, updatePassword, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
