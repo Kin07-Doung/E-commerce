@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useAlert } from '../context/AlertContext';
+import SEO from '../components/SEO';
 
 const Profile = () => {
   const { user } = useAuth();
@@ -120,7 +121,13 @@ const Profile = () => {
   ];
 
   return (
-    <div className="container py-8 max-w-4xl mx-auto px-4">
+    <>
+      <SEO
+        title="My Profile"
+        description="Manage your FoodHub account, view orders, and update your preferences."
+        url="/profile"
+      />
+      <div className="container py-8 max-w-4xl mx-auto px-4">
       {/* Header */}
       <div className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl border-2 border-orange-200 p-6 mb-6 shadow-lg">
         <div className="flex items-center gap-4">
@@ -234,10 +241,15 @@ const Profile = () => {
         <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
         <span className="flex items-center gap-1">🛡️ Privacy Protected</span>
         <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-        <span className="flex items-center gap-1">⭐ Verified Member</span>
+          <span className="flex items-center gap-1">⭐ Verified Member</span>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
 export default Profile;
+
+ Profile;
+
+

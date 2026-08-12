@@ -5,6 +5,7 @@ import Dropdown from '../components/ui/Dropdown';
 import Modal from '../components/ui/Modal';
 import { useAlert } from '../context/AlertContext';
 import Alert from '../components/ui/Alert';
+import SEO from '../components/SEO';
 
 const AdminCategories = () => {
   const [categories, setCategories] = useState([]);
@@ -173,7 +174,14 @@ const AdminCategories = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <>
+      <SEO
+        title="Food Categories"
+        description="Admin dashboard for managing product categories and organization."
+        url="/admin/categories"
+        noIndex
+      />
+      <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 bg-gradient-to-r from-orange-50 to-amber-50 p-6 rounded-2xl border-2 border-orange-200">
         <div className="flex items-center gap-3">
@@ -425,7 +433,9 @@ const AdminCategories = () => {
         )}
       </Modal>
     </div>
+    </>
   );
 };
 
 export default AdminCategories;
+

@@ -5,6 +5,7 @@ import Dropdown from '../components/ui/Dropdown';
 import Modal from '../components/ui/Modal';
 import { useAlert } from '../context/AlertContext';
 import { useAuth } from '../context/AuthContext';
+import SEO from '../components/SEO';
 
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
@@ -115,7 +116,14 @@ const AdminUsers = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <>
+      <SEO
+        title="Users"
+        description="Admin dashboard for managing customers and staff accounts."
+        url="/admin/users"
+        noIndex
+      />
+      <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 bg-gradient-to-r from-orange-50 to-amber-50 p-6 rounded-2xl border-2 border-orange-200">
         <div className="flex items-center gap-3">
@@ -374,7 +382,9 @@ const AdminUsers = () => {
         )}
       </Modal>
     </div>
+    </>
   );
 };
 
 export default AdminUsers;
+

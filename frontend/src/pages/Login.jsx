@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Alert from '../components/ui/Alert';
 import { useGoogleSignIn } from '../hooks/useGoogleSignIn';
+import SEO from '../components/SEO';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -38,7 +39,14 @@ const Login = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 p-4">
+    <>
+      <SEO
+        title="Login"
+        description="Welcome back to FoodHub. Sign in to continue ordering delicious fresh food."
+        url="/login"
+        noIndex
+      />
+      <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 p-4">
       <div className="bg-white rounded-2xl border-2 border-orange-200 p-8 w-full max-w-md shadow-xl">
          {/* Header */}
          <div className="text-center mb-8">
@@ -145,7 +153,8 @@ const Login = () => {
           <span className="flex items-center gap-1">⭐ Fresh Guarantee</span>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

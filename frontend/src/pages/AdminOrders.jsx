@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import Button from '../components/ui/Button';
 import { useAlert } from '../context/AlertContext';
+import SEO from '../components/SEO';
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -85,7 +86,14 @@ const AdminOrders = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <>
+      <SEO
+        title="All Orders"
+        description="Admin dashboard for managing and tracking customer orders."
+        url="/admin/orders"
+        noIndex
+      />
+      <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 bg-gradient-to-r from-orange-50 to-amber-50 p-6 rounded-2xl border-2 border-orange-200">
         <div className="flex items-center gap-3">
@@ -246,7 +254,8 @@ const AdminOrders = () => {
           </button>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 };
 

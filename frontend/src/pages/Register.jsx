@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Alert from '../components/ui/Alert';
 import { useGoogleSignIn } from '../hooks/useGoogleSignIn';
+import SEO from '../components/SEO';
 
 const Register = () => {
   const [name, setName] = useState('');
@@ -39,7 +40,14 @@ const Register = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 p-4">
+    <>
+      <SEO
+        title="Create Account"
+        description="Join FoodHub and start ordering delicious fresh food. Free delivery on orders over $50."
+        url="/register"
+        noIndex
+      />
+      <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 p-4">
       <div className="bg-white rounded-2xl border-2 border-orange-200 p-8 w-full max-w-md shadow-xl">
          {/* Header */}
          <div className="text-center mb-8">
@@ -164,9 +172,10 @@ const Register = () => {
             <span className="flex items-center gap-1">⭐ Fresh guarantee</span>
             <span className="flex items-center gap-1">💬 24/7 support</span>
           </div>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

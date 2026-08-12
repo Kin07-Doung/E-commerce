@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useAlert } from '../context/AlertContext';
 import Alert from '../components/ui/Alert';
+import SEO from '../components/SEO';
 
 const Wishlist = () => {
   const [items, setItems] = useState([]);
@@ -120,7 +121,13 @@ const Wishlist = () => {
   }
 
   return (
-    <div className="container py-8 max-w-6xl mx-auto px-4">
+    <>
+      <SEO
+        title="My Wishlist"
+        description="Your saved favorite food items on FoodHub. Add to cart when ready."
+        url="/wishlist"
+      />
+      <div className="container py-8 max-w-6xl mx-auto px-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gradient-to-r from-orange-50 to-amber-50 p-6 rounded-2xl border-2 border-orange-200 mb-6">
         <div className="flex items-center gap-3">
@@ -256,7 +263,8 @@ const Wishlist = () => {
           ))}
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 };
 

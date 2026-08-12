@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
 import { useAlert } from '../context/AlertContext';
+import SEO from '../components/SEO';
 
 const OrderConfirmation = () => {
   const { id } = useParams();
@@ -85,7 +86,13 @@ const OrderConfirmation = () => {
   };
 
   return (
-    <div className="container py-8 max-w-2xl mx-auto px-4">
+    <>
+      <SEO
+        title="Order Confirmed"
+        description={`Thank you for your order #${order.id}! Your fresh food is being packed with care.`}
+        url={`/order-confirmation/${id}`}
+      />
+      <div className="container py-8 max-w-2xl mx-auto px-4">
       {/* Confirmation Card */}
       <div className="bg-white rounded-2xl border-2 border-orange-200 shadow-xl overflow-hidden">
         {/* Header */}
@@ -205,6 +212,7 @@ const OrderConfirmation = () => {
         </p>
       </div>
     </div>
+    </>
   );
 };
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import Button from '../components/ui/Button';
 import { useAlert } from '../context/AlertContext';
+import SEO from '../components/SEO';
 
 const AdminPOS = () => {
   const [products, setProducts] = useState([]);
@@ -113,7 +114,14 @@ const AdminPOS = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <>
+      <SEO
+        title="POS Terminal"
+        description="Admin POS terminal for processing sales and managing transactions."
+        url="/admin/pos"
+        noIndex
+      />
+      <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 bg-gradient-to-r from-orange-50 to-amber-50 p-6 rounded-2xl border-2 border-orange-200">
         <div className="flex items-center gap-3">
@@ -355,11 +363,14 @@ const AdminPOS = () => {
                 )}
               </button>
             </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
 export default AdminPOS;
+
+

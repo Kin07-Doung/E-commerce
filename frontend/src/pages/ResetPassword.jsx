@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
+import SEO from '../components/SEO';
 
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
@@ -51,7 +52,14 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 p-4">
+    <>
+      <SEO
+        title="Reset Password"
+        description="Enter your new password to regain access to your FoodHub account."
+        url="/reset-password"
+        noIndex
+      />
+      <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 p-4">
       <div className="bg-white rounded-2xl border-2 border-orange-200 p-8 w-full max-w-md shadow-xl">
         {/* Header */}
         <div className="text-center mb-8">
@@ -180,7 +188,10 @@ const ResetPassword = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
 export default ResetPassword;
+
+

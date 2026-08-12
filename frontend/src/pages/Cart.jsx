@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useAlert } from '../context/AlertContext';
+import SEO from '../components/SEO';
 
 const Cart = () => {
   const [items, setItems] = useState([]);
@@ -82,7 +83,13 @@ const Cart = () => {
   }
 
   return (
-    <div className="container py-8 space-y-6 max-w-6xl mx-auto px-4">
+    <>
+      <SEO
+        title="Your Cart"
+        description="Review your items and proceed to checkout. Fresh food delivery with free shipping on orders over $50."
+        url="/cart"
+      />
+      <div className="container py-8 space-y-6 max-w-6xl mx-auto px-4">
       {/* Header */}
       <div className="flex items-center justify-between bg-gradient-to-r from-orange-50 to-amber-50 p-6 rounded-2xl border-2 border-orange-200">
         <div className="flex items-center gap-3">
@@ -240,6 +247,7 @@ const Cart = () => {
         </div>
       )}
     </div>
+    </>
   );
 };
 

@@ -5,6 +5,7 @@ import Button from '../components/ui/Button';
 import Dropdown from '../components/ui/Dropdown';
 import Modal from '../components/ui/Modal';
 import { useAlert } from '../context/AlertContext';
+import SEO from '../components/SEO';
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
@@ -178,7 +179,14 @@ const AdminProducts = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <>
+      <SEO
+        title="Products"
+        description="Admin dashboard for managing product inventory, prices, and stock."
+        url="/admin/products"
+        noIndex
+      />
+      <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 bg-gradient-to-r from-orange-50 to-amber-50 p-6 rounded-2xl border-2 border-orange-200">
         <div className="flex items-center gap-3">
@@ -521,7 +529,9 @@ const AdminProducts = () => {
         )}
       </Modal>
     </div>
+    </>
   );
 };
 
 export default AdminProducts;
+

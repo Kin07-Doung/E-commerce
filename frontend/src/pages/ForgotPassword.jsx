@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
+import SEO from '../components/SEO';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -25,7 +26,14 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 p-4">
+    <>
+      <SEO
+        title="Forgot Password"
+        description="Reset your FoodHub account password. Enter your email to receive a secure reset link."
+        url="/forgot-password"
+        noIndex
+      />
+      <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 p-4">
       <div className="bg-white rounded-2xl border-2 border-orange-200 p-8 w-full max-w-md shadow-xl">
         {/* Header */}
         <div className="text-center mb-8">
@@ -101,9 +109,10 @@ const ForgotPassword = () => {
             <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
             <span>⏱️</span> 24/7 support
           </div>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

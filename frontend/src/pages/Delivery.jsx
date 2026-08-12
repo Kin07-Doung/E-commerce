@@ -1,9 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import SEO from '../components/SEO';
 
 const Delivery = () => {
   return (
-    <div className="container py-8 max-w-4xl mx-auto px-4">
+    <>
+      <SEO
+        title="Delivery Information"
+        description="Fast and reliable food delivery to your doorstep. Standard 1-2 days, express same-day available."
+        url="/delivery"
+      />
+      <div className="container py-8 max-w-4xl mx-auto px-4">
       <div className="bg-gradient-to-r from-orange-50 to-amber-50 p-6 rounded-2xl border-2 border-orange-200 mb-6">
         <div className="flex items-center gap-3">
           <div className="p-3 bg-orange-100 rounded-xl">
@@ -41,6 +48,7 @@ const Delivery = () => {
         <Link to="/" className="text-orange-600 hover:text-orange-700 font-medium">← Back to Store</Link>
       </div>
     </div>
+    </>
   );
 };
 

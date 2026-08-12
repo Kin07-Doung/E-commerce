@@ -4,6 +4,7 @@ import api from '../services/api';
 import ProductCard from '../components/ProductCard';
 import { useAlert } from '../context/AlertContext';
 import { useAuth } from '../context/AuthContext';
+import SEO from '../components/SEO';
 
 const PRODUCTS_PER_PAGE = 12;
 
@@ -145,7 +146,13 @@ const Products = () => {
   }
 
   return (
-    <div className="space-y-0">
+    <>
+      <SEO
+        title="Our Menu"
+        description="Browse our curated selection of delicious food — from fresh bakery to premium cuts, all handpicked by real food lovers. Free delivery on orders over $50."
+        url="/products"
+      />
+      <div className="space-y-0">
       {/* Hero Section */}
       <div className="bg-gradient-to-br from-orange-600 via-orange-500 to-amber-600 text-white py-16 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
@@ -274,6 +281,7 @@ const Products = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

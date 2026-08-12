@@ -6,6 +6,7 @@ import { useAlert } from '../context/AlertContext';
 import Alert from '../components/ui/Alert';
 import Modal from '../components/ui/Modal';
 import AddressForm from '../components/AddressForm';
+import SEO from '../components/SEO';
 
 const AddressBook = () => {
   const [addresses, setAddresses] = useState([]);
@@ -103,7 +104,13 @@ const AddressBook = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto px-4">
+    <>
+      <SEO
+        title="My Addresses"
+        description="Manage your delivery addresses for fast and accurate food delivery."
+        url="/addresses"
+      />
+      <div className="space-y-6 max-w-5xl mx-auto px-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-gradient-to-r from-orange-50 to-amber-50 p-6 rounded-2xl border-2 border-orange-200">
         <div className="flex items-center gap-3">
@@ -262,6 +269,7 @@ const AddressBook = () => {
         />
       </Modal>
     </div>
+    </>
   );
 };
 

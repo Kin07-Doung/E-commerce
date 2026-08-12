@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useAlert } from '../context/AlertContext';
+import SEO from '../components/SEO';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -118,7 +119,14 @@ const ProductDetail = () => {
   const stockStatus = getStockStatus(product.stock);
 
   return (
-    <div className="container py-8 max-w-5xl mx-auto px-4">
+    <>
+      <SEO
+        title={product.name}
+        description={product.description || `Buy ${product.name} fresh and fast. Free delivery on orders over $50.`}
+        image={product.image_url}
+        url={`/products/${id}`}
+      />
+      <div className="container py-8 max-w-5xl mx-auto px-4">
       {/* Back Button */}
       <Link to="/products" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-orange-600 transition-colors group mb-4">
         <svg className="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -273,7 +281,12 @@ const ProductDetail = () => {
         </p>
       </div>
     </div>
+    </>
   );
 };
 
 export default ProductDetail;
+
+ ProductDetail;
+
+

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useAlert } from '../context/AlertContext';
+import SEO from '../components/SEO';
 
 const formatAddress = (a) => {
   if (!a) return '';
@@ -105,7 +106,13 @@ const Checkout = () => {
   }
 
   return (
-    <div className="container py-8 max-w-4xl mx-auto px-4">
+    <>
+      <SEO
+        title="Checkout"
+        description="Complete your order securely. Choose your delivery address and enjoy fresh food delivered to your doorstep."
+        url="/checkout"
+      />
+      <div className="container py-8 max-w-4xl mx-auto px-4">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6 bg-gradient-to-r from-orange-50 to-amber-50 p-6 rounded-2xl border-2 border-orange-200">
         <div className="p-3 bg-orange-100 rounded-xl">
@@ -291,6 +298,7 @@ Phone: (555) 123-4567"
         </div>
       </div>
     </div>
+    </>
   );
 };
 

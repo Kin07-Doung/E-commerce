@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import SEO from '../components/SEO';
 
 const FAQ = () => {
   const faqs = [
@@ -12,7 +13,13 @@ const FAQ = () => {
   ];
 
   return (
-    <div className="container py-8 max-w-4xl mx-auto px-4">
+    <>
+      <SEO
+        title="Frequently Asked Questions"
+        description="Find answers to common questions about FoodHub delivery, returns, payments, and more."
+        url="/faq"
+      />
+      <div className="container py-8 max-w-4xl mx-auto px-4">
       <div className="bg-gradient-to-r from-orange-50 to-amber-50 p-6 rounded-2xl border-2 border-orange-200 mb-6">
         <div className="flex items-center gap-3">
           <div className="p-3 bg-orange-100 rounded-xl">
@@ -42,6 +49,7 @@ const FAQ = () => {
         <Link to="/" className="text-orange-600 hover:text-orange-700 font-medium">← Back to Store</Link>
       </div>
     </div>
+    </>
   );
 };
 

@@ -1,9 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import SEO from '../components/SEO';
 
 const Returns = () => {
   return (
-    <div className="container py-8 max-w-4xl mx-auto px-4">
+    <>
+      <SEO
+        title="Returns Policy"
+        description="Easy returns for your peace of mind. 24-hour return window for freshness concerns."
+        url="/returns"
+      />
+      <div className="container py-8 max-w-4xl mx-auto px-4">
       <div className="bg-gradient-to-r from-orange-50 to-amber-50 p-6 rounded-2xl border-2 border-orange-200 mb-6">
         <div className="flex items-center gap-3">
           <div className="p-3 bg-orange-100 rounded-xl">
@@ -39,6 +46,7 @@ const Returns = () => {
         <Link to="/" className="text-orange-600 hover:text-orange-700 font-medium">← Back to Store</Link>
       </div>
     </div>
+    </>
   );
 };
 

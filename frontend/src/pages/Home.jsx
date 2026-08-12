@@ -4,6 +4,7 @@ import api from '../services/api';
 import ProductCard from '../components/ProductCard';
 import { useAlert } from '../context/AlertContext';
 import { useAuth } from '../context/AuthContext';
+import SEO from '../components/SEO';
 
 const Home = () => {
   const [products, setProducts] = useState([]);
@@ -112,7 +113,13 @@ const Home = () => {
   }
 
   return (
-    <div>
+    <>
+      <SEO
+        title="Home"
+        description="Discover fresh, quality ingredients and mouth-watering meals. Order now and enjoy the best culinary experience at home with free delivery on orders over $50."
+        url="/"
+      />
+      <div>
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-orange-600 via-orange-500 to-amber-600 text-white overflow-hidden">
         <div className="absolute inset-0 opacity-10">
@@ -309,6 +316,7 @@ const Home = () => {
         </div>
       </section>
     </div>
+    </>
   );
 };
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import { useAlert } from '../context/AlertContext';
+import SEO from '../components/SEO';
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -90,7 +91,13 @@ const Orders = () => {
   }
 
   return (
-    <div className="container py-8 max-w-6xl mx-auto px-4">
+    <>
+      <SEO
+        title="My Orders"
+        description="Track and manage your food orders. View order history, delivery status, and more."
+        url="/orders"
+      />
+      <div className="container py-8 max-w-6xl mx-auto px-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gradient-to-r from-orange-50 to-amber-50 p-6 rounded-2xl border-2 border-orange-200 mb-6">
         <div className="flex items-center gap-3">
@@ -243,6 +250,7 @@ const Orders = () => {
         </>
       )}
     </div>
+    </>
   );
 };
 

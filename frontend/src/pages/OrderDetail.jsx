@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
 import { useAlert } from '../context/AlertContext';
+import SEO from '../components/SEO';
 
 const OrderDetail = () => {
   const { id } = useParams();
@@ -104,7 +105,13 @@ const OrderDetail = () => {
   }
 
   return (
-    <div className="container py-8 max-w-4xl mx-auto px-4">
+    <>
+      <SEO
+        title={`Order #${order.id}`}
+        description={`View details for order #${order.id}. Track delivery status and items.`}
+        url={`/orders/${id}`}
+      />
+      <div className="container py-8 max-w-4xl mx-auto px-4">
       {/* Back Button */}
       <Link to="/orders" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-orange-600 transition-colors group mb-4">
         <svg className="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -269,6 +276,7 @@ const OrderDetail = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
