@@ -95,7 +95,13 @@ const ProductDetail = () => {
 
   if (error || !product) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center px-4">
+      <>
+        <SEO
+          title="Product Not Found"
+          description="The product you are looking for does not exist. Browse our full selection at Kin Shop."
+          url="/products"
+        />
+        <div className="min-h-[60vh] flex items-center justify-center px-4">
         <div className="w-full max-w-md rounded-xl border border-gray-200 bg-white p-10 text-center shadow-sm">
           <h2 className="text-lg font-semibold text-gray-900">Product not found</h2>
           <p className="mt-2 text-sm text-gray-500">
@@ -109,6 +115,7 @@ const ProductDetail = () => {
           </Link>
         </div>
       </div>
+      </>
     );
   }
 
@@ -124,6 +131,31 @@ const ProductDetail = () => {
         }
         image={product.image_url}
         url={`/products/${id}`}
+        structuredData={{
+          '@context': 'https://schema.org',
+          '@type': 'Product',
+          name: product.name,
+          description: product.description || `Buy ${product.name} at Kin Shop.`,
+          image: product.image_url
+            ? `${product.image_url.startsWith('http') ? product.image_url : `https://e-order.student-edu.online${product.image_url}`}`
+            : 'https://e-order.student-edu.online/og-image.png',
+          sku: product.id,
+          brand: {
+            '@type': 'Brand',
+            name: 'Kin Shop',
+          },
+          offers: {
+            '@type': 'Offer',
+            url: `https://e-order.student-edu.online/products/${product.id}`,
+            priceCurrency: 'USD',
+            price: parseFloat(product.price).toFixed(2),
+            availability: product.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+            seller: {
+              '@type': 'Organization',
+              name: 'Kin Shop',
+            },
+          },
+        }}
       />
 
       <div className="bg-gray-50 min-h-screen">

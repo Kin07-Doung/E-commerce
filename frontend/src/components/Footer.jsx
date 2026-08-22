@@ -10,12 +10,12 @@ const Footer = () => {
           <div>
             <Link to="/" className="inline-flex items-center gap-2 text-lg font-semibold text-gray-900">
               <span className="flex h-7 w-7 items-center justify-center rounded-md bg-orange-600 text-xs font-bold text-white">
-                FH
+                KS
               </span>
-              FoodHub
+              Kin Shop
             </Link>
             <p className="mt-3 text-sm text-gray-500 leading-relaxed">
-              Fresh ingredients and quality meals delivered to your door.
+              Welcome to Kin Shop. Browse and order products online with ease.
             </p>
             <div className="mt-4 flex gap-2">
               {['twitter', 'facebook', 'instagram', 'youtube'].map((network) => (
@@ -119,20 +119,20 @@ const Footer = () => {
             </h3>
             <ul className="mt-4 space-y-3 text-sm text-gray-500">
               <li>
-                123 Food Street
-                <br />
-                Culinary City, FC 12345
+                <span className="text-sm text-gray-500">
+                  Phnom Penh, Cambodia
+                </span>
               </li>
-              <li>
-                <a href="tel:+15551234567" className="hover:text-orange-600 transition-colors">
-                  +1 (555) 123-4567
-                </a>
-              </li>
-              <li>
-                <a href="mailto:support@foodhub.com" className="hover:text-orange-600 transition-colors">
-                  support@foodhub.com
-                </a>
-              </li>
+               <li>
+                 <a href="tel:+855883996258" className="hover:text-orange-600 transition-colors">
+                   +855 883 996 258
+                 </a>
+               </li>
+               <li>
+                 <a href="mailto:kindoung7@gmail.com" className="hover:text-orange-600 transition-colors">
+                   kindoung7@gmail.com
+                 </a>
+               </li>
               <li>Mon–Sat: 8:00 AM – 10:00 PM</li>
             </ul>
           </div>
@@ -141,7 +141,7 @@ const Footer = () => {
         {/* Bottom */}
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-gray-100 pt-8 sm:flex-row">
           <p className="text-xs text-gray-400">
-            © {new Date().getFullYear()} FoodHub. All rights reserved.
+            © {new Date().getFullYear()} Kin Shop. All rights reserved.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-gray-400">
             <span>Free delivery over $50</span>

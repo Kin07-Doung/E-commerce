@@ -90,8 +90,7 @@ const Home = () => {
   return (
     <>
       <SEO
-        title="Home"
-        description="Discover fresh, quality ingredients and meals. Free delivery on orders over $50."
+        description="Welcome to Kin Shop. Browse and order products online with ease at e-order.student-edu.online."
         url="/"
       />
 
@@ -102,14 +101,14 @@ const Home = () => {
           <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
             <div className="max-w-2xl">
               <p className="text-sm font-medium uppercase tracking-wide text-orange-100">
-                Fresh food delivery
+                Kin Shop Official Online Store
               </p>
               <h1 className="mt-3 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-                Quality ingredients, delivered to your door
+                Kin Shop
               </h1>
               <p className="mt-4 text-lg text-orange-50/90 leading-relaxed">
-                Shop fresh produce, pantry staples, and ready-to-cook meals.
-                Free delivery on orders over $50.
+                Quality ingredients and meals delivered to your door. Browse and
+                order products online with ease. Free delivery on orders over $50.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
@@ -178,7 +177,7 @@ const Home = () => {
           </div>
 
           {/* Product grid */}
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {filtered.map((product) => (
               <ProductCard
                 key={product.id}

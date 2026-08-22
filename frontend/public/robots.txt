@@ -1,0 +1,11 @@
+# Kin Shop — robots.txt
+# https://e-order.student-edu.online/
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://e-order.student-edu.online/sitemap.xml
+
+# Crawl delay (optional, polite for shared hosting)
+Crawl-delay: 5

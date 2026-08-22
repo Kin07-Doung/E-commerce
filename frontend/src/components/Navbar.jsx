@@ -136,16 +136,16 @@ const Navbar = () => {
          {/* Main Navbar */}
          <div className="container flex justify-between items-center h-20">
              {/* Logo */}
-             <Link to="/" className="flex items-center gap-2 text-2xl font-bold group">
-               <span className="text-3xl group-hover:animate-wobble transition-transform">🍽️</span>
-               <div className="flex flex-col leading-none">
-                 <span className="text-orange-600">Food</span>
-                 <span className="text-amber-600 -mt-1">Hub</span>
-               </div>
-               <span className="hidden sm:inline-block ml-2 font-handwritten text-orange-500 text-base font-medium animate-pulse">
-                 handcrafted with love
-               </span>
-             </Link>
+              <Link to="/" className="flex items-center gap-2 text-2xl font-bold group">
+                <span className="text-3xl group-hover:animate-wobble transition-transform">🛒</span>
+                <div className="flex flex-col leading-none">
+                  <span className="text-orange-600">Kin</span>
+                  <span className="text-amber-600 -mt-1">Shop</span>
+                </div>
+                <span className="hidden sm:inline-block ml-2 font-handwritten text-orange-500 text-base font-medium animate-pulse">
+                  Your e-order destination
+                </span>
+              </Link>
 
           {/* Search Bar - Desktop */}
           <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-xl mx-6">

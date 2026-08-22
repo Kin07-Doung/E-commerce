@@ -329,7 +329,7 @@ router.get('/dashboard', async (req, res) => {
     const [productsRes, categoriesRes, ordersRes, allProductsRes] = await Promise.all([
       Product.findAll(1, 1000),
       Category.findAll(),
-      Order.findAll(1, 1000),
+      Order.findAll(1, 1000, 'created_at DESC'),
       Product.findAll(1, 1000),
     ]);
 

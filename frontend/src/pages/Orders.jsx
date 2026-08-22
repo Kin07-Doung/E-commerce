@@ -127,6 +127,7 @@ const Orders = () => {
         title="My Orders"
         description="Track and manage your orders. View order history and delivery status."
         url="/orders"
+        noIndex
       />
 
       <div className="bg-gray-50 min-h-screen">
@@ -193,19 +194,12 @@ const Orders = () => {
                             {order.shipping_address}
                           </p>
                         )}
-                        {order.items && order.items.length > 0 && (
+                        {(order.total_quantity || order.item_count) && (
                           <p className="mt-1 text-xs text-gray-400">
-                            {order.items.length}{' '}
-                            {order.items.length === 1 ? 'item' : 'items'}
-                            {order.items.slice(0, 2).map((item, idx) => (
-                              <span key={idx}>
-                                {' · '}
-                                {item.product_name}
-                              </span>
-                            ))}
-                            {order.items.length > 2 && (
-                              <span> · +{order.items.length - 2} more</span>
-                            )}
+                            {order.total_quantity || 0}{' '}
+                            {order.total_quantity === 1 || (order.total_quantity ?? 0) === 1 ? 'item' : 'items'} total
+                            {' · '}
+                            {order.item_count || 0} {order.item_count === 1 ? 'product' : 'products'}
                           </p>
                         )}
                       </div>

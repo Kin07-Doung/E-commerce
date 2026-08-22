@@ -123,6 +123,7 @@ const Checkout = () => {
         title="Checkout"
         description="Complete your order securely. Choose your delivery address."
         url="/checkout"
+        noIndex
       />
 
       <div className="bg-gray-50 min-h-screen">

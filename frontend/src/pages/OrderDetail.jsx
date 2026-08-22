@@ -95,6 +95,7 @@ const OrderDetail = () => {
         title={`Order #${order.id}`}
         description={`View details for order #${order.id}.`}
         url={`/orders/${id}`}
+        noIndex
       />
 
       <div className="bg-gray-50 min-h-screen">

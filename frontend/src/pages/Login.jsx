@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useGoogleSignIn } from '../hooks/useGoogleSignIn';
+import { useRateLimit } from '../hooks/useRateLimit';
 import SEO from '../components/SEO';
 
 const Login = () => {
@@ -10,6 +11,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login, googleSignIn } = useAuth();
+  const { isRateLimited, retryAfter, handleError, clearRateLimit, RateLimitBanner } = useRateLimit();
   const navigate = useNavigate();
 
   const handleGoogleSignIn = async (credential) => {
@@ -28,10 +30,19 @@ const Login = () => {
     setError('');
     setLoading(true);
     try {
-      await login(email, password);
+      const token = window.grecaptcha?.getResponse();
+      if (!token) {
+        setError('Please complete the reCAPTCHA');
+        setLoading(false);
+        return;
+      }
+      await login(email, password, token);
+      clearRateLimit();
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+      if (!handleError(err)) {
+        setError(err.response?.data?.message || 'Login failed');
+      }
     } finally {
       setLoading(false);
     }
@@ -41,7 +52,7 @@ const Login = () => {
     <>
       <SEO
         title="Login"
-        description="Sign in to your FoodHub account to continue ordering."
+        description="Sign in to your Kin Shop account to continue ordering."
         url="/login"
         noIndex
       />
@@ -59,12 +70,13 @@ const Login = () => {
               </p>
             </div>
 
-            {/* Error */}
-            {error && (
-              <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                {error}
-              </div>
-            )}
+             {/* Error */}
+             {error && !isRateLimited && (
+               <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                 {error}
+               </div>
+             )}
+             <RateLimitBanner />
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="mt-6 space-y-4">
@@ -103,15 +115,21 @@ const Login = () => {
                 />
               </div>
 
+              <div
+                id="recaptcha-login"
+                data-sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                className="g-recaptcha flex justify-center"
+              />
+
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || isRateLimited}
                 className="flex w-full items-center justify-center gap-2 rounded-lg bg-orange-600 py-2.5 text-sm font-medium text-white hover:bg-orange-700 transition-colors disabled:cursor-not-allowed disabled:bg-gray-300"
               >
-                {loading ? (
+                {(loading || isRateLimited) ? (
                   <>
                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                    Signing in…
+                    {isRateLimited ? `Wait ${retryAfter}s` : 'Signing in…'}
                   </>
                 ) : (
                   'Sign in'
