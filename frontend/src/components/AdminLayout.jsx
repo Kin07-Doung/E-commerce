@@ -92,9 +92,9 @@ const AdminLayout = () => {
             className="flex items-center gap-2 text-sm font-semibold text-gray-900"
           >
             <span className="flex h-7 w-7 items-center justify-center rounded-md bg-orange-600 text-xs font-bold text-white">
-              FH
+              KS
             </span>
-            FoodHub
+            Kin Shop
             <span className="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-gray-500">
               Admin
             </span>

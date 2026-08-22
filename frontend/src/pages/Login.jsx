@@ -41,7 +41,7 @@ const Login = () => {
     <>
       <SEO
         title="Login"
-        description="Sign in to your FoodHub account to continue ordering."
+        description="Sign in to your Kin Shop account to continue ordering."
         url="/login"
         noIndex
       />

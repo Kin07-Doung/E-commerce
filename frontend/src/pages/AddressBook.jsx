@@ -128,6 +128,7 @@ const AddressBook = () => {
         title="My Addresses"
         description="Manage your delivery addresses for fast and accurate delivery."
         url="/addresses"
+        noIndex
       />
 
       <div className="bg-gray-50 min-h-screen">

@@ -127,6 +127,7 @@ const Orders = () => {
         title="My Orders"
         description="Track and manage your orders. View order history and delivery status."
         url="/orders"
+        noIndex
       />
 
       <div className="bg-gray-50 min-h-screen">

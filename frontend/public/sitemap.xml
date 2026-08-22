@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="https://www.sitemap.org/schemas/sitemap/0.9"
+        xmlns:image="https://www.sitemap.org/schemas/sitemap/image/1.1">
+
+  <!-- Homepage -->
+  <url>
+    <loc>https://e-order.student-edu.online/</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://e-order.student-edu.online/og-image.svg</image:loc>
+      <image:title>Kin Shop | Official Online Store</image:title>
+      <image:caption>Welcome to Kin Shop. Browse and order products online with ease.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Products listing -->
+  <url>
+    <loc>https://e-order.student-edu.online/products</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Product detail pages (placeholder — add real product URLs as they are created) -->
+  <url>
+    <loc>https://e-order.student-edu.online/products/1</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Static informational pages -->
+  <url>
+    <loc>https://e-order.student-edu.online/about</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://e-order.student-edu.online/contact</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://e-order.student-edu.online/faq</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://e-order.student-edu.online/delivery</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://e-order.student-edu.online/returns</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+</urlset>

@@ -42,7 +42,7 @@ const Register = () => {
     <>
       <SEO
         title="Create Account"
-        description="Join FoodHub and start ordering. Free delivery on orders over $50."
+        description="Join Kin Shop and start ordering. Free delivery on orders over $50."
         url="/register"
         noIndex
       />
@@ -56,7 +56,7 @@ const Register = () => {
                 Create account
               </h1>
               <p className="mt-2 text-sm text-gray-500">
-                Join FoodHub to order fresh food and track deliveries
+                Join Kin Shop to order fresh food and track deliveries
               </p>
             </div>
 

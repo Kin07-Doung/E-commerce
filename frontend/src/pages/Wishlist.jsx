@@ -101,6 +101,7 @@ const Wishlist = () => {
         title="My Wishlist"
         description="Your saved favorite items. Add to cart when ready."
         url="/wishlist"
+        noIndex
       />
 
       <div className="bg-gray-50 min-h-screen">

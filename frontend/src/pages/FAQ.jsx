@@ -40,7 +40,7 @@ const FAQ = () => {
     <>
       <SEO
         title="Frequently Asked Questions"
-        description="Find answers to common questions about FoodHub delivery, returns, payments, and more."
+        description="Find answers to common questions about Kin Shop delivery, returns, payments, and more."
         url="/faq"
       />
 

@@ -29,7 +29,7 @@ const ForgotPassword = () => {
     <>
       <SEO
         title="Forgot Password"
-        description="Reset your FoodHub account password. Enter your email to receive a secure reset link."
+        description="Reset your Kin Shop account password. Enter your email to receive a secure reset link."
         url="/forgot-password"
         noIndex
       />
