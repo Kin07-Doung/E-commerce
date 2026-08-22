@@ -3,11 +3,10 @@ import { Link } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useAlert } from '../context/AlertContext';
-import Alert from '../components/ui/Alert';
 import SEO from '../components/SEO';
 
 const Settings = () => {
-  const { user, updateProfile, updatePassword } = useAuth();
+  const { updateProfile, updatePassword } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const { showSuccess, showError } = useAlert();
@@ -27,7 +26,11 @@ const Settings = () => {
       try {
         const res = await api.get('/user/profile');
         setProfile(res.data);
-        setForm({ name: res.data.name, email: res.data.email, phone: res.data.phone || '' });
+        setForm({
+          name: res.data.name,
+          email: res.data.email,
+          phone: res.data.phone || '',
+        });
       } catch (err) {
         showError(err.response?.data?.message || 'Failed to load profile');
       } finally {
@@ -50,11 +53,12 @@ const Settings = () => {
     try {
       const updated = await updateProfile(form.name, form.email, form.phone || null);
       setProfile(updated);
-      setFormSuccess('✅ Profile updated successfully');
-      showSuccess('✅ Profile updated successfully');
+      setFormSuccess('Profile updated successfully');
+      showSuccess('Profile updated successfully');
     } catch (err) {
-      setFormError(err.response?.data?.message || 'Failed to update profile');
-      showError(err.response?.data?.message || 'Failed to update profile');
+      const msg = err.response?.data?.message || 'Failed to update profile';
+      setFormError(msg);
+      showError(msg);
     } finally {
       setSaving(false);
     }
@@ -71,32 +75,35 @@ const Settings = () => {
     setPwdSaving(true);
     try {
       const res = await updatePassword(pwdForm.currentPassword, pwdForm.newPassword);
-      setPwdMessage({ type: 'success', text: '✅ ' + (res.message || 'Password updated successfully') });
+      setPwdMessage({
+        type: 'success',
+        text: res.message || 'Password updated successfully',
+      });
       setPwdForm({ currentPassword: '', newPassword: '' });
-      showSuccess('🔑 Password updated successfully');
+      showSuccess('Password updated successfully');
     } catch (err) {
-      setPwdMessage({ type: 'error', text: err.response?.data?.message || 'Failed to update password' });
-      showError(err.response?.data?.message || 'Failed to update password');
+      const msg = err.response?.data?.message || 'Failed to update password';
+      setPwdMessage({ type: 'error', text: msg });
+      showError(msg);
     } finally {
       setPwdSaving(false);
     }
   };
 
-  const getInitials = (name) => {
-    return name
+  const getInitials = (name = '') =>
+    name
       .split(' ')
-      .map(word => word[0])
+      .map((word) => word[0])
       .join('')
       .toUpperCase()
       .slice(0, 2);
-  };
 
   if (loading) {
     return (
-      <div className="container py-20 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin" />
-          <p className="text-orange-600 font-medium">Loading settings...</p>
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-10 w-10 rounded-full border-2 border-gray-200 border-t-orange-500 animate-spin" />
+          <p className="text-sm text-gray-500">Loading settings…</p>
         </div>
       </div>
     );
@@ -106,207 +113,189 @@ const Settings = () => {
     <>
       <SEO
         title="Account Settings"
-        description="Update your personal information, change your password, and manage account security."
+        description="Update your personal information and password."
         url="/settings"
       />
-      <div className="container py-8 max-w-3xl mx-auto px-4">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gradient-to-r from-orange-50 to-amber-50 p-6 rounded-2xl border-2 border-orange-200 mb-6">
-        <div className="flex items-center gap-3">
-          <div className="p-3 bg-orange-100 rounded-xl">
-            <span className="text-2xl">⚙️</span>
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold text-gray-800">Account Settings</h2>
-            <p className="text-sm text-gray-500">Manage your account preferences</p>
-          </div>
-        </div>
-        <Link to="/profile" className="text-sm text-gray-500 hover:text-orange-600 transition-colors flex items-center gap-1 group">
-          <span className="group-hover:-translate-x-1 transition-transform">←</span>
-          Back to Profile
-        </Link>
-      </div>
 
-      {/* Profile Information */}
-      <div className="bg-white rounded-2xl border-2 border-orange-200 p-6 shadow-lg mb-6">
-        <div className="flex items-center gap-3 mb-4 pb-3 border-b-2 border-orange-100">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center text-white text-sm font-bold shadow-md">
-            {getInitials(form.name)}
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800">Personal Information</h3>
-            <p className="text-xs text-gray-400">Update your personal details</p>
-          </div>
-        </div>
-        
-        {formError && (
-          <div className="bg-red-50 border-2 border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm mb-4 flex items-center gap-2">
-            <span>❌</span>
-            <span>{formError}</span>
-          </div>
-        )}
-        {formSuccess && (
-          <div className="bg-green-50 border-2 border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm mb-4 flex items-center gap-2">
-            <span>✅</span>
-            <span>{formSuccess}</span>
-          </div>
-        )}
-        
-        <form onSubmit={handleProfileSubmit} className="flex flex-col gap-4 max-w-lg">
-          <div>
-            <label className="flex items-center gap-1 text-xs font-semibold text-gray-600 mb-1.5">
-              <span>👤</span> Full Name
-            </label>
-            <input 
-              type="text" 
-              name="name" 
-              value={form.name} 
-              onChange={handleProfileChange} 
-              required 
-              className="w-full px-4 py-2.5 bg-orange-50/50 border-2 border-orange-200 rounded-xl text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200"
-            />
-          </div>
-          <div>
-            <label className="flex items-center gap-1 text-xs font-semibold text-gray-600 mb-1.5">
-              <span>📧</span> Email Address
-            </label>
-            <input 
-              type="email" 
-              name="email" 
-              value={form.email} 
-              onChange={handleProfileChange} 
-              required 
-              className="w-full px-4 py-2.5 bg-orange-50/50 border-2 border-orange-200 rounded-xl text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200"
-            />
-          </div>
-          <div>
-            <label className="flex items-center gap-1 text-xs font-semibold text-gray-600 mb-1.5">
-              <span>📱</span> Phone Number
-            </label>
-            <input 
-              type="tel" 
-              name="phone" 
-              value={form.phone} 
-              onChange={handleProfileChange} 
-              className="w-full px-4 py-2.5 bg-orange-50/50 border-2 border-orange-200 rounded-xl text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200"
-              placeholder="Enter your phone number"
-            />
-          </div>
-          <button 
-            type="submit" 
-            disabled={saving} 
-            className="self-start bg-gradient-to-r from-orange-500 to-amber-500 text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:from-orange-600 hover:to-amber-600 transition-all duration-200 shadow-md hover:shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-          >
-            {saving ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                💾 Save Changes
-              </>
-            )}
-          </button>
-        </form>
-      </div>
-
-      {/* Change Password */}
-      {profile?.provider === 'email' && (
-        <div className="bg-white rounded-2xl border-2 border-orange-200 p-6 shadow-lg">
-          <div className="flex items-center gap-3 mb-4 pb-3 border-b-2 border-orange-100">
-            <span className="text-2xl">🔑</span>
+      <div className="bg-gray-50 min-h-screen">
+        <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
+          {/* Header */}
+          <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h3 className="text-lg font-semibold text-gray-800">Change Password</h3>
-              <p className="text-xs text-gray-400">Update your account password</p>
+              <h1 className="text-2xl font-semibold tracking-tight text-gray-900">
+                Account settings
+              </h1>
+              <p className="mt-1 text-sm text-gray-500">
+                Manage your personal information and security
+              </p>
             </div>
+            <Link
+              to="/profile"
+              className="text-sm font-medium text-gray-500 hover:text-orange-600 transition-colors"
+            >
+              ← Back to account
+            </Link>
           </div>
-          
-          {pwdMessage.text && (
-            <div className={`border-2 px-4 py-3 rounded-xl text-sm mb-4 flex items-center gap-2 ${
-              pwdMessage.type === 'success' 
-                ? 'bg-green-50 border-green-200 text-green-700' 
-                : 'bg-red-50 border-red-200 text-red-700'
-            }`}>
-              <span>{pwdMessage.type === 'success' ? '✅' : '❌'}</span>
-              <span>{pwdMessage.text}</span>
+
+          {/* Personal information */}
+          <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6 mb-6">
+            <div className="mb-5 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100 text-sm font-semibold text-orange-700">
+                {getInitials(form.name)}
+              </div>
+              <div>
+                <h2 className="text-sm font-semibold text-gray-900">
+                  Personal information
+                </h2>
+                <p className="text-xs text-gray-500">Update your name, email, and phone</p>
+              </div>
+            </div>
+
+            {formError && (
+              <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {formError}
+              </div>
+            )}
+            {formSuccess && (
+              <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                {formSuccess}
+              </div>
+            )}
+
+            <form onSubmit={handleProfileSubmit} className="space-y-4 max-w-md">
+              <div>
+                <label className="mb-1.5 block text-xs font-medium text-gray-500">
+                  Full name
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={form.name}
+                  onChange={handleProfileChange}
+                  required
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-xs font-medium text-gray-500">
+                  Email address
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleProfileChange}
+                  required
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-xs font-medium text-gray-500">
+                  Phone number
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={form.phone}
+                  onChange={handleProfileChange}
+                  placeholder="Optional"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={saving}
+                className="inline-flex items-center gap-2 rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700 transition-colors disabled:cursor-not-allowed disabled:bg-gray-300"
+              >
+                {saving ? (
+                  <>
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    Saving…
+                  </>
+                ) : (
+                  'Save changes'
+                )}
+              </button>
+            </form>
+          </div>
+
+          {/* Change password */}
+          {profile?.provider === 'email' && (
+            <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6 mb-6">
+              <div className="mb-5">
+                <h2 className="text-sm font-semibold text-gray-900">
+                  Change password
+                </h2>
+                <p className="mt-0.5 text-xs text-gray-500">
+                  Update the password for your account
+                </p>
+              </div>
+
+              {pwdMessage.text && (
+                <div
+                  className={`mb-4 rounded-lg border px-4 py-3 text-sm ${
+                    pwdMessage.type === 'success'
+                      ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                      : 'border-red-200 bg-red-50 text-red-700'
+                  }`}
+                >
+                  {pwdMessage.text}
+                </div>
+              )}
+
+              <form onSubmit={handlePwdSubmit} className="space-y-4 max-w-md">
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-gray-500">
+                    Current password
+                  </label>
+                  <input
+                    type="password"
+                    name="currentPassword"
+                    value={pwdForm.currentPassword}
+                    onChange={handlePwdChange}
+                    required
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-gray-500">
+                    New password
+                  </label>
+                  <input
+                    type="password"
+                    name="newPassword"
+                    value={pwdForm.newPassword}
+                    onChange={handlePwdChange}
+                    required
+                    minLength={6}
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                  />
+                  <p className="mt-1 text-xs text-gray-400">
+                    Must be at least 6 characters
+                  </p>
+                </div>
+                <button
+                  type="submit"
+                  disabled={pwdSaving}
+                  className="inline-flex items-center gap-2 rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700 transition-colors disabled:cursor-not-allowed disabled:bg-gray-300"
+                >
+                  {pwdSaving ? (
+                    <>
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      Updating…
+                    </>
+                  ) : (
+                    'Update password'
+                  )}
+                </button>
+              </form>
             </div>
           )}
-          
-          <form onSubmit={handlePwdSubmit} className="flex flex-col gap-4 max-w-lg">
-            <div>
-              <label className="flex items-center gap-1 text-xs font-semibold text-gray-600 mb-1.5">
-                <span>🔒</span> Current Password
-              </label>
-              <input 
-                type="password" 
-                name="currentPassword" 
-                value={pwdForm.currentPassword} 
-                onChange={handlePwdChange} 
-                required 
-                className="w-full px-4 py-2.5 bg-orange-50/50 border-2 border-orange-200 rounded-xl text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200"
-                placeholder="Enter your current password"
-              />
-            </div>
-            <div>
-              <label className="flex items-center gap-1 text-xs font-semibold text-gray-600 mb-1.5">
-                <span>✨</span> New Password
-              </label>
-              <input 
-                type="password" 
-                name="newPassword" 
-                value={pwdForm.newPassword} 
-                onChange={handlePwdChange} 
-                required 
-                minLength={6} 
-                className="w-full px-4 py-2.5 bg-orange-50/50 border-2 border-orange-200 rounded-xl text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200"
-                placeholder="Enter a new password (min 6 chars)"
-              />
-              <p className="text-xs text-gray-400 mt-1">Password must be at least 6 characters</p>
-            </div>
-            <button 
-              type="submit" 
-              disabled={pwdSaving} 
-              className="self-start bg-gradient-to-r from-orange-500 to-amber-500 text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:from-orange-600 hover:to-amber-600 transition-all duration-200 shadow-md hover:shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-            >
-              {pwdSaving ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Updating...
-                </>
-              ) : (
-                <>
-                  🔑 Update Password
-                </>
-              )}
-            </button>
-          </form>
-        </div>
-      )}
 
-      {/* Security Tips */}
-      <div className="mt-6 p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl border-2 border-orange-200">
-        <div className="flex items-start gap-3">
-          <span className="text-2xl">🛡️</span>
-          <div>
-            <h4 className="text-sm font-semibold text-gray-700">Security Tips</h4>
-            <ul className="text-xs text-gray-500 mt-1 space-y-1">
-              <li>• Use a strong, unique password for your account</li>
-              <li>• Enable two-factor authentication for extra security</li>
-              <li>• Never share your password with anyone</li>
-              <li>• Update your password regularly</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      {/* Trust Badges */}
-      <div className="mt-4 flex flex-wrap justify-center gap-4 text-xs text-gray-400">
-        <span className="flex items-center gap-1">🔒 Secure Connection</span>
-        <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-        <span className="flex items-center gap-1">🛡️ Privacy Protected</span>
-        <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-          <span className="flex items-center gap-1">⭐ Verified Account</span>
+          {/* Security note */}
+          <p className="text-center text-xs text-gray-400">
+            Use a strong password and never share it. Your connection is secure.
+          </p>
         </div>
       </div>
     </>
@@ -314,7 +303,3 @@ const Settings = () => {
 };
 
 export default Settings;
-
- Settings;
-
-

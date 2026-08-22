@@ -34,34 +34,33 @@ const Profile = () => {
       try {
         const wRes = await api.get('/wishlist/count');
         setWishlistCount(wRes.data.count);
-      } catch (err) {
+      } catch {
         setWishlistCount(0);
       }
       try {
         const oRes = await api.get('/orders?page=1&limit=1');
         setOrdersCount(oRes.data.total || 0);
-      } catch (err) {
+      } catch {
         setOrdersCount(0);
       }
     };
     loadCounts();
   }, [showError]);
 
-  const getInitials = (name) => {
-    return name
+  const getInitials = (name = '') =>
+    name
       .split(' ')
-      .map(word => word[0])
+      .map((word) => word[0])
       .join('')
       .toUpperCase()
       .slice(0, 2);
-  };
 
   if (loading) {
     return (
-      <div className="container py-20 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin" />
-          <p className="text-orange-600 font-medium">Loading your profile...</p>
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-10 w-10 rounded-full border-2 border-gray-200 border-t-orange-500 animate-spin" />
+          <p className="text-sm text-gray-500">Loading profile…</p>
         </div>
       </div>
     );
@@ -69,179 +68,220 @@ const Profile = () => {
 
   if (error && !profile) {
     return (
-      <div className="container py-20 max-w-md mx-auto px-4">
-        <div className="bg-white rounded-2xl border-2 border-red-200 p-12 text-center shadow-lg">
-          <span className="text-6xl block mb-4">❌</span>
-          <h3 className="text-xl font-bold text-red-600 mb-2">Failed to Load Profile</h3>
-          <p className="text-gray-500 mb-6">{error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
-            className="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-8 py-3 rounded-xl font-medium hover:from-orange-600 hover:to-amber-600 transition-all duration-200 shadow-md hover:shadow-lg active:scale-95"
+      <div className="min-h-[60vh] flex items-center justify-center px-4">
+        <div className="w-full max-w-md rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-500">
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h2 className="text-lg font-semibold text-gray-900">Unable to load profile</h2>
+          <p className="mt-2 text-sm text-gray-500">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-6 inline-flex items-center justify-center rounded-lg bg-orange-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-orange-700 transition-colors"
           >
-            Try Again
+            Try again
           </button>
         </div>
       </div>
     );
   }
 
-  const links = [
-    { 
-      to: '/orders', 
-      label: 'My Orders', 
-      desc: 'View your order history and track deliveries', 
-      icon: '📋', 
-      count: ordersCount, 
-      countLabel: 'orders',
-      color: 'from-orange-500 to-amber-500'
+  const quickLinks = [
+    {
+      to: '/orders',
+      label: 'Orders',
+      description: 'Track, reorder, and view history',
+      count: ordersCount,
+      countLabel: ordersCount === 1 ? 'order' : 'orders',
+      icon: (
+        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+      ),
     },
-    { 
-      to: '/wishlist', 
-      label: 'My Wishlist', 
-      desc: 'View and manage your saved items', 
-      icon: '❤️', 
-      count: wishlistCount, 
-      countLabel: 'items',
-      color: 'from-red-500 to-pink-500'
+    {
+      to: '/wishlist',
+      label: 'Wishlist',
+      description: 'Saved items for later',
+      count: wishlistCount,
+      countLabel: wishlistCount === 1 ? 'item' : 'items',
+      icon: (
+        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+      ),
     },
-    { 
-      to: '/addresses', 
-      label: 'My Addresses', 
-      desc: 'Manage your shipping and delivery addresses', 
-      icon: '📍',
-      color: 'from-brand-500 to-amber-500'
+    {
+      to: '/addresses',
+      label: 'Addresses',
+      description: 'Shipping & billing addresses',
+      icon: (
+        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      ),
     },
-    { 
-      to: '/settings', 
-      label: 'Account Settings', 
-      desc: 'Edit personal info and change password', 
-      icon: '⚙️',
-      color: 'from-purple-500 to-indigo-500'
-    }
+    {
+      to: '/settings',
+      label: 'Account settings',
+      description: 'Personal info & password',
+      icon: (
+        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      ),
+    },
   ];
 
   return (
     <>
       <SEO
         title="My Profile"
-        description="Manage your FoodHub account, view orders, and update your preferences."
+        description="Manage your account, orders, wishlist, and preferences."
         url="/profile"
       />
-      <div className="container py-8 max-w-4xl mx-auto px-4">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl border-2 border-orange-200 p-6 mb-6 shadow-lg">
-        <div className="flex items-center gap-4">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center text-white text-2xl font-bold shadow-lg shadow-orange-200">
-            {getInitials(profile.name)}
-          </div>
-          <div className="flex-1">
-            <h2 className="text-2xl font-bold text-gray-800">Welcome back, {profile.name.split(' ')[0]}! 👋</h2>
-            <p className="text-sm text-gray-500">Manage your account and preferences</p>
-            <p className="font-handwritten text-orange-500 text-base">
-              Real person, real account
+
+      <div className="bg-gray-50 min-h-screen">
+        <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+          {/* Page header */}
+          <div className="mb-8">
+            <h1 className="text-2xl font-semibold tracking-tight text-gray-900">My account</h1>
+            <p className="mt-1 text-sm text-gray-500">
+              Manage your profile, orders, and preferences
             </p>
           </div>
-        </div>
-      </div>
 
-      {/* Profile Info Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-        <div className="bg-white rounded-2xl border-2 border-orange-200 p-4 shadow-lg hover:shadow-xl transition-shadow duration-200">
-          <p className="text-xs text-gray-500 flex items-center gap-1">👤 Name</p>
-          <p className="text-sm font-semibold text-gray-800 mt-1">{profile.name}</p>
-        </div>
-        <div className="bg-white rounded-2xl border-2 border-orange-200 p-4 shadow-lg hover:shadow-xl transition-shadow duration-200">
-          <p className="text-xs text-gray-500 flex items-center gap-1">📧 Email</p>
-          <p className="text-sm font-semibold text-gray-800 mt-1">{profile.email}</p>
-        </div>
-        <div className="bg-white rounded-2xl border-2 border-orange-200 p-4 shadow-lg hover:shadow-xl transition-shadow duration-200">
-          <p className="text-xs text-gray-500 flex items-center gap-1">📱 Phone</p>
-          <p className="text-sm font-semibold text-gray-800 mt-1">{profile.phone || 'Not provided'}</p>
-        </div>
-      </div>
+          <div className="grid gap-6 lg:grid-cols-3">
+            {/* Left column – Profile summary */}
+            <div className="lg:col-span-1 space-y-6">
+              <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                <div className="flex flex-col items-center text-center sm:items-start sm:text-left">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-orange-100 text-lg font-semibold text-orange-700">
+                    {getInitials(profile.name)}
+                  </div>
+                  <h2 className="mt-4 text-lg font-semibold text-gray-900">{profile.name}</h2>
+                  <p className="mt-0.5 text-sm text-gray-500">{profile.email}</p>
 
-      {/* Additional Info */}
-      <div className="bg-white rounded-2xl border-2 border-orange-200 p-6 shadow-lg mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <p className="text-xs text-gray-500 flex items-center gap-1">👑 Role</p>
-            <p className="text-sm font-semibold text-gray-800 mt-1 capitalize">
-              {profile.role === 'admin' ? '👑 Administrator' : '👤 Customer'}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs text-gray-500 flex items-center gap-1">🔐 Sign-in Method</p>
-            <p className="text-sm font-semibold text-gray-800 mt-1 capitalize">{profile.provider}</p>
-          </div>
-          <div>
-            <p className="text-xs text-gray-500 flex items-center gap-1">📅 Member Since</p>
-            <p className="text-sm font-semibold text-gray-800 mt-1">{new Date(profile.created_at).toLocaleDateString('en-US', { 
-              month: 'long', 
-              day: 'numeric', 
-              year: 'numeric' 
-            })}</p>
-          </div>
-        </div>
-      </div>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700 capitalize">
+                      {profile.role === 'admin' ? 'Administrator' : 'Customer'}
+                    </span>
+                    {profile.provider && (
+                      <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700 capitalize">
+                        {profile.provider}
+                      </span>
+                    )}
+                  </div>
+                </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {links.map((link) => (
-          <Link 
-            key={link.to} 
-            to={link.to} 
-            className="group flex items-center gap-4 bg-white rounded-2xl border-2 border-orange-200 p-5 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-          >
-            <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${link.color} flex items-center justify-center text-3xl shadow-lg flex-shrink-0`}>
-              {link.icon}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-baseline justify-between">
-                <h3 className="text-base font-bold text-gray-800 group-hover:text-orange-600 transition-colors">
-                  {link.label}
-                </h3>
-                {link.count !== undefined && link.count >= 0 && (
-                  <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${link.color} text-white`}>
-                    {link.count} {link.countLabel}
-                  </span>
-                )}
+                <dl className="mt-6 space-y-4 border-t border-gray-100 pt-6">
+                  <div>
+                    <dt className="text-xs font-medium uppercase tracking-wide text-gray-400">Phone</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{profile.phone || 'Not provided'}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs font-medium uppercase tracking-wide text-gray-400">Member since</dt>
+                    <dd className="mt-1 text-sm text-gray-900">
+                      {new Date(profile.created_at).toLocaleDateString('en-US', {
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}
+                    </dd>
+                  </div>
+                </dl>
+
+                <div className="mt-6">
+                  <Link
+                    to="/settings"
+                    className="flex w-full items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    Edit profile
+                  </Link>
+                </div>
               </div>
-              <p className="text-sm text-gray-500 mt-0.5">{link.desc}</p>
-            </div>
-            <div className="text-gray-300 group-hover:text-orange-500 transition-colors group-hover:translate-x-1">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </div>
-          </Link>
-        ))}
-      </div>
 
-      {/* Admin Quick Access */}
-      {profile.role === 'admin' && (
-        <div className="mt-6 p-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl border-2 border-purple-200 shadow-lg">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <span className="text-3xl">🛠️</span>
-              <div>
-                <h3 className="text-lg font-bold text-gray-800">Admin Dashboard</h3>
-                <p className="text-sm text-gray-500">Manage products, orders, users and more</p>
+              {/* Admin quick access */}
+              {profile.role === 'admin' && (
+                <div className="rounded-xl border border-purple-200 bg-purple-50 p-5">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-purple-100 text-purple-700">
+                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-sm font-semibold text-gray-900">Admin panel</h3>
+                      <p className="mt-0.5 text-xs text-gray-600">Manage products, orders & users</p>
+                      <Link
+                        to="/admin"
+                        className="mt-3 inline-flex items-center text-sm font-medium text-purple-700 hover:text-purple-800"
+                      >
+                        Open dashboard
+                        <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Right column – Quick links */}
+            <div className="lg:col-span-2">
+              <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+                <div className="border-b border-gray-100 px-6 py-4">
+                  <h2 className="text-sm font-semibold text-gray-900">Quick links</h2>
+                </div>
+                <ul className="divide-y divide-gray-100">
+                  {quickLinks.map((item) => (
+                    <li key={item.to}>
+                      <Link
+                        to={item.to}
+                        className="group flex items-center gap-4 px-6 py-4 hover:bg-gray-50 transition-colors"
+                      >
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-orange-600 group-hover:bg-orange-100 transition-colors">
+                          {item.icon}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-sm font-medium text-gray-900 group-hover:text-orange-700 transition-colors">
+                              {item.label}
+                            </p>
+                            {item.count !== undefined && (
+                              <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700">
+                                {item.count} {item.countLabel}
+                              </span>
+                            )}
+                          </div>
+                          <p className="mt-0.5 text-sm text-gray-500">{item.description}</p>
+                        </div>
+                        <svg
+                          className="h-5 w-5 shrink-0 text-gray-300 group-hover:text-orange-500 group-hover:translate-x-0.5 transition-all"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
               </div>
-            </div>
-            <Link to="/admin" className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-6 py-3 rounded-xl font-medium hover:from-purple-600 hover:to-indigo-600 transition-all duration-200 shadow-md hover:shadow-lg active:scale-95 flex items-center gap-2">
-              <span>⚡</span> Go to Admin Panel
-            </Link>
-          </div>
-        </div>
-      )}
 
-      {/* Trust Badges */}
-      <div className="mt-6 flex flex-wrap justify-center gap-4 text-xs text-gray-400">
-        <span className="flex items-center gap-1">🔒 Secure Account</span>
-        <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-        <span className="flex items-center gap-1">🛡️ Privacy Protected</span>
-        <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-          <span className="flex items-center gap-1">⭐ Verified Member</span>
+              {/* Trust / security note */}
+              <p className="mt-6 text-center text-xs text-gray-400">
+                Your account is protected with industry-standard security.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </>
@@ -249,7 +289,3 @@ const Profile = () => {
 };
 
 export default Profile;
-
- Profile;
-
-

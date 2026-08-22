@@ -2,7 +2,18 @@ import React, { useState, useEffect } from 'react';
 
 const AddressForm = ({ initial, onSubmit, onCancel, disabled, isLoading }) => {
   const [form, setForm] = useState(
-    initial || { label: '', name: '', phone: '', address_line1: '', address_line2: '', city: '', state: '', postal_code: '', country: '', is_default: false }
+    initial || {
+      label: '',
+      name: '',
+      phone: '',
+      address_line1: '',
+      address_line2: '',
+      city: '',
+      state: '',
+      postal_code: '',
+      country: '',
+      is_default: false,
+    }
   );
 
   const [errors, setErrors] = useState({});
@@ -54,27 +65,34 @@ const AddressForm = ({ initial, onSubmit, onCancel, disabled, isLoading }) => {
   };
 
   const inputClasses = (fieldName) =>
-    `w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 ${
-      errors[fieldName] ? 'border-red-300 bg-red-50' : 'border-slate-200'
+    `w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
+      errors[fieldName]
+        ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500'
+        : 'border-gray-300 focus:border-orange-500 focus:ring-orange-500'
     }`;
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="label" className="block text-xs font-medium text-slate-500 mb-1.5">Label</label>
+        <label htmlFor="label" className="mb-1.5 block text-xs font-medium text-gray-500">
+          Label
+        </label>
         <input
           id="label"
           type="text"
           name="label"
           value={form.label}
           onChange={handleChange}
-          placeholder="Home, Work..."
+          placeholder="Home, Work…"
           className={inputClasses('label')}
           autoComplete="off"
         />
       </div>
+
       <div>
-        <label htmlFor="name" className="block text-xs font-medium text-slate-500 mb-1.5">Full Name</label>
+        <label htmlFor="name" className="mb-1.5 block text-xs font-medium text-gray-500">
+          Full name <span className="text-red-500">*</span>
+        </label>
         <input
           id="name"
           type="text"
@@ -85,10 +103,15 @@ const AddressForm = ({ initial, onSubmit, onCancel, disabled, isLoading }) => {
           className={inputClasses('name')}
           autoComplete="name"
         />
-        {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name}</p>}
+        {errors.name && (
+          <p className="mt-1 text-xs text-red-600">{errors.name}</p>
+        )}
       </div>
+
       <div>
-        <label htmlFor="phone" className="block text-xs font-medium text-slate-500 mb-1.5">Phone</label>
+        <label htmlFor="phone" className="mb-1.5 block text-xs font-medium text-gray-500">
+          Phone <span className="text-red-500">*</span>
+        </label>
         <input
           id="phone"
           type="tel"
@@ -99,10 +122,15 @@ const AddressForm = ({ initial, onSubmit, onCancel, disabled, isLoading }) => {
           autoComplete="tel"
           placeholder="+1 234 567 8900"
         />
-        {errors.phone && <p className="mt-1 text-xs text-red-500">{errors.phone}</p>}
+        {errors.phone && (
+          <p className="mt-1 text-xs text-red-600">{errors.phone}</p>
+        )}
       </div>
+
       <div>
-        <label htmlFor="address_line1" className="block text-xs font-medium text-slate-500 mb-1.5">Address Line 1</label>
+        <label htmlFor="address_line1" className="mb-1.5 block text-xs font-medium text-gray-500">
+          Address line 1 <span className="text-red-500">*</span>
+        </label>
         <input
           id="address_line1"
           type="text"
@@ -113,10 +141,15 @@ const AddressForm = ({ initial, onSubmit, onCancel, disabled, isLoading }) => {
           className={inputClasses('address_line1')}
           autoComplete="address-line1"
         />
-        {errors.address_line1 && <p className="mt-1 text-xs text-red-500">{errors.address_line1}</p>}
+        {errors.address_line1 && (
+          <p className="mt-1 text-xs text-red-600">{errors.address_line1}</p>
+        )}
       </div>
+
       <div>
-        <label htmlFor="address_line2" className="block text-xs font-medium text-slate-500 mb-1.5">Address Line 2</label>
+        <label htmlFor="address_line2" className="mb-1.5 block text-xs font-medium text-gray-500">
+          Address line 2
+        </label>
         <input
           id="address_line2"
           type="text"
@@ -125,12 +158,15 @@ const AddressForm = ({ initial, onSubmit, onCancel, disabled, isLoading }) => {
           onChange={handleChange}
           className={inputClasses('address_line2')}
           autoComplete="address-line2"
-          placeholder="Apt, suite, unit, building, floor, etc."
+          placeholder="Apt, suite, unit, building, floor…"
         />
       </div>
+
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="city" className="block text-xs font-medium text-slate-500 mb-1.5">City</label>
+          <label htmlFor="city" className="mb-1.5 block text-xs font-medium text-gray-500">
+            City <span className="text-red-500">*</span>
+          </label>
           <input
             id="city"
             type="text"
@@ -141,10 +177,14 @@ const AddressForm = ({ initial, onSubmit, onCancel, disabled, isLoading }) => {
             className={inputClasses('city')}
             autoComplete="address-level2"
           />
-          {errors.city && <p className="mt-1 text-xs text-red-500">{errors.city}</p>}
+          {errors.city && (
+            <p className="mt-1 text-xs text-red-600">{errors.city}</p>
+          )}
         </div>
         <div>
-          <label htmlFor="state" className="block text-xs font-medium text-slate-500 mb-1.5">State / Province</label>
+          <label htmlFor="state" className="mb-1.5 block text-xs font-medium text-gray-500">
+            State / Province
+          </label>
           <input
             id="state"
             type="text"
@@ -156,7 +196,9 @@ const AddressForm = ({ initial, onSubmit, onCancel, disabled, isLoading }) => {
           />
         </div>
         <div>
-          <label htmlFor="postal_code" className="block text-xs font-medium text-slate-500 mb-1.5">Postal Code</label>
+          <label htmlFor="postal_code" className="mb-1.5 block text-xs font-medium text-gray-500">
+            Postal code <span className="text-red-500">*</span>
+          </label>
           <input
             id="postal_code"
             type="text"
@@ -167,10 +209,14 @@ const AddressForm = ({ initial, onSubmit, onCancel, disabled, isLoading }) => {
             className={inputClasses('postal_code')}
             autoComplete="postal-code"
           />
-          {errors.postal_code && <p className="mt-1 text-xs text-red-500">{errors.postal_code}</p>}
+          {errors.postal_code && (
+            <p className="mt-1 text-xs text-red-600">{errors.postal_code}</p>
+          )}
         </div>
         <div>
-          <label htmlFor="country" className="block text-xs font-medium text-slate-500 mb-1.5">Country</label>
+          <label htmlFor="country" className="mb-1.5 block text-xs font-medium text-gray-500">
+            Country <span className="text-red-500">*</span>
+          </label>
           <input
             id="country"
             type="text"
@@ -181,43 +227,44 @@ const AddressForm = ({ initial, onSubmit, onCancel, disabled, isLoading }) => {
             className={inputClasses('country')}
             autoComplete="country"
           />
-          {errors.country && <p className="mt-1 text-xs text-red-500">{errors.country}</p>}
+          {errors.country && (
+            <p className="mt-1 text-xs text-red-600">{errors.country}</p>
+          )}
         </div>
       </div>
-      <label className="flex items-center gap-2 text-sm cursor-pointer select-none text-slate-700">
+
+      <label className="flex cursor-pointer select-none items-center gap-2 text-sm text-gray-700">
         <input
           type="checkbox"
           name="is_default"
           checked={form.is_default}
           onChange={handleChange}
-          className="w-4 h-4 rounded text-brand-600 border-slate-300 focus:ring-brand-500"
+          className="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
         />
         Set as default address
       </label>
-      <div className="flex justify-end gap-2 pt-2">
+
+      <div className="flex justify-end gap-2 border-t border-gray-100 pt-4">
         <button
           type="button"
           onClick={onCancel}
           disabled={disabled || isLoading}
-          className="px-4 py-2 text-sm font-medium transition-colors border rounded-lg text-slate-700 border-slate-200 hover:bg-slate-50 disabled:opacity-50"
+          className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={disabled || isLoading}
-          className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white transition-colors rounded-lg shadow-sm bg-brand-600 hover:bg-brand-700 disabled:opacity-50"
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700 transition-colors disabled:cursor-not-allowed disabled:bg-gray-300"
         >
           {isLoading ? (
             <>
-              <svg className="w-4 h-4 mr-2 -ml-1 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Saving...
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              Saving…
             </>
           ) : (
-            'Save'
+            'Save address'
           )}
         </button>
       </div>

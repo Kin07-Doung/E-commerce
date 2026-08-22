@@ -33,83 +33,94 @@ const ForgotPassword = () => {
         url="/forgot-password"
         noIndex
       />
-      <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 p-4">
-      <div className="bg-white rounded-2xl border-2 border-orange-200 p-8 w-full max-w-md shadow-xl">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-orange-100 to-amber-100 rounded-full mb-4 shadow-lg">
-            <span className="text-4xl">🔑</span>
-          </div>
-          <h2 className="text-2xl font-bold text-gray-800">Forgot Password</h2>
-          <p className="text-sm text-gray-500 mt-2">Enter your email and we'll send you a reset link</p>
-        </div>
 
-        {/* Alert Messages */}
-        {error && (
-          <div className="bg-red-50 border-2 border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm mb-4 flex items-center gap-2">
-            <span>❌</span>
-            <span>{error}</span>
-          </div>
-        )}
-        {message && (
-          <div className="bg-green-50 border-2 border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm mb-4 flex items-center gap-2">
-            <span>✅</span>
-            <span>{message}</span>
-          </div>
-        )}
+      <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-gray-50 px-4 py-12">
+        <div className="w-full max-w-md">
+          <div className="rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
+            {/* Header */}
+            <div className="text-center">
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-orange-50 text-orange-600">
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.75}
+                    d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
+                  />
+                </svg>
+              </div>
+              <h1 className="text-2xl font-semibold tracking-tight text-gray-900">
+                Forgot password?
+              </h1>
+              <p className="mt-2 text-sm text-gray-500">
+                Enter your email and we’ll send you a reset link
+              </p>
+            </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          <div>
-            <label className="flex items-center gap-1 text-xs font-semibold text-gray-600 mb-1.5">
-              <span>📧</span> Email Address
-            </label>
-            <input 
-              type="email" 
-              placeholder="Enter your email address" 
-              value={email} 
-              onChange={e => setEmail(e.target.value)} 
-              required 
-              className="w-full px-4 py-2.5 bg-orange-50/50 border-2 border-orange-200 rounded-xl text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200 placeholder:text-gray-400"
-            />
-          </div>
-
-          <button 
-            type="submit" 
-            disabled={loading} 
-            className="w-full py-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:from-orange-600 hover:to-amber-600 shadow-md hover:shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? (
-              <>
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Sending...
-              </>
-            ) : (
-              <>
-                <span>📨</span> Send Reset Link
-              </>
+            {/* Alerts */}
+            {error && (
+              <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {error}
+              </div>
             )}
-          </button>
-        </form>
+            {message && (
+              <div className="mt-6 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                {message}
+              </div>
+            )}
 
-        {/* Footer Links */}
-        <div className="mt-6 pt-4 border-t-2 border-orange-100 flex flex-col sm:flex-row justify-between items-center gap-3">
-          <Link to="/login" className="text-sm text-orange-600 hover:text-orange-700 font-medium transition-colors flex items-center gap-1">
-            <span>←</span> Back to Login
-          </Link>
-          <Link to="/register" className="text-sm text-gray-500 hover:text-orange-600 transition-colors">
-            Create an account
-          </Link>
-        </div>
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="mt-6 space-y-5">
+              <div>
+                <label className="mb-1.5 block text-xs font-medium text-gray-500">
+                  Email address
+                </label>
+                <input
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                />
+              </div>
 
-        {/* Trust Badge */}
-        <div className="mt-4 flex justify-center">
-          <div className="flex items-center gap-2 text-xs text-gray-400">
-            <span>🔒</span> Secure password reset
-            <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-            <span>⏱️</span> 24/7 support
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-orange-600 py-2.5 text-sm font-medium text-white hover:bg-orange-700 transition-colors disabled:cursor-not-allowed disabled:bg-gray-300"
+              >
+                {loading ? (
+                  <>
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    Sending…
+                  </>
+                ) : (
+                  'Send reset link'
+                )}
+              </button>
+            </form>
+
+            {/* Footer links */}
+            <div className="mt-6 flex flex-col items-center gap-2 border-t border-gray-100 pt-5 sm:flex-row sm:justify-between">
+              <Link
+                to="/login"
+                className="text-sm font-medium text-gray-500 hover:text-orange-600 transition-colors"
+              >
+                ← Back to login
+              </Link>
+              <Link
+                to="/register"
+                className="text-sm font-medium text-gray-500 hover:text-orange-600 transition-colors"
+              >
+                Create an account
+              </Link>
+            </div>
           </div>
-          </div>
+
+          <p className="mt-6 text-center text-xs text-gray-400">
+            Secure password reset · We never share your email
+          </p>
         </div>
       </div>
     </>

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
-import Button from '../components/ui/Button';
 import Dropdown from '../components/ui/Dropdown';
 import Modal from '../components/ui/Modal';
 import { useAlert } from '../context/AlertContext';
@@ -23,52 +22,21 @@ const AdminCategories = () => {
   const [viewCategory, setViewCategory] = useState(null);
   const { showSuccess, showError } = useAlert();
 
-  // Food category emoji mappings
   const getCategoryEmoji = (name) => {
     const emojis = {
-      'bakery': '🍞',
-      'dairy': '🥛',
-      'meat': '🥩',
-      'seafood': '🐟',
-      'fish': '🐟',
-      'fruits': '🍎',
-      'fruit': '🍎',
-      'vegetables': '🥬',
-      'vegetable': '🥬',
-      'organic': '🌿',
-      'fresh': '✨',
-      'seasonal': '🍂',
-      'spices': '🌶️',
-      'beverages': '🥤',
-      'drinks': '🥤',
-      'snacks': '🍿',
-      'desserts': '🍰',
-      'dessert': '🍰',
-      'bread': '🍞',
-      'pasta': '🍝',
-      'rice': '🍚',
-      'sauce': '🥫',
-      'sauces': '🥫',
-      'oil': '🫒',
-      'oils': '🫒',
-      'herbs': '🌿',
-      'spice': '🌶️',
-      'cheese': '🧀',
-      'eggs': '🥚',
-      'egg': '🥚',
-      'milk': '🥛',
-      'yogurt': '🫗',
-      'chicken': '🍗',
-      'beef': '🥩',
-      'pork': '🥓',
-      'lamb': '🍖',
-      'seafood': '🦐'
+      bakery: '🍞', dairy: '🥛', meat: '🥩', seafood: '🐟', fish: '🐟',
+      fruits: '🍎', fruit: '🍎', vegetables: '🥬', vegetable: '🥬',
+      organic: '🌿', fresh: '✨', seasonal: '🍂', spices: '🌶️',
+      beverages: '🥤', drinks: '🥤', snacks: '🍿', desserts: '🍰', dessert: '🍰',
+      bread: '🍞', pasta: '🍝', rice: '🍚', sauce: '🥫', sauces: '🥫',
+      oil: '🫒', oils: '🫒', herbs: '🌿', spice: '🌶️', cheese: '🧀',
+      eggs: '🥚', egg: '🥚', milk: '🥛', yogurt: '🫗', chicken: '🍗',
+      beef: '🥩', pork: '🥓', lamb: '🍖',
     };
-    
     if (!name) return '🏷️';
-    const lowerName = name.toLowerCase();
+    const lower = name.toLowerCase();
     for (const [key, emoji] of Object.entries(emojis)) {
-      if (lowerName.includes(key)) return emoji;
+      if (lower.includes(key)) return emoji;
     }
     return '🏷️';
   };
@@ -83,7 +51,7 @@ const AdminCategories = () => {
       const data = res.data;
       setCategories(data.categories || data);
       setTotalPages(data.totalPages || 1);
-    } catch (err) {
+    } catch {
       showError('Failed to load categories');
     }
   };
@@ -97,7 +65,7 @@ const AdminCategories = () => {
       setDescription('');
       setIcon('🏷️');
       loadCategories();
-      showSuccess(`✅ Category "${name}" created successfully!`);
+      showSuccess(`Category "${name}" created`);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create category');
     }
@@ -106,24 +74,28 @@ const AdminCategories = () => {
   const handleUpdate = async (id) => {
     setError('');
     try {
-      await api.put(`/categories/${id}`, { name: editName, description: editDescription, icon: editIcon });
+      await api.put(`/categories/${id}`, {
+        name: editName,
+        description: editDescription,
+        icon: editIcon,
+      });
       setEditingId(null);
       setEditName('');
       setEditDescription('');
       setEditIcon('🏷️');
       loadCategories();
-      showSuccess(`✅ Category "${editName}" updated successfully!`);
+      showSuccess(`Category "${editName}" updated`);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update category');
     }
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('🗑️ Delete this category? Products in this category will become uncategorized.')) return;
+    if (!confirm('Delete this category? Products in this category will become uncategorized.')) return;
     try {
       await api.delete(`/categories/${id}`);
       loadCategories();
-      showSuccess('🗑️ Category deleted successfully');
+      showSuccess('Category deleted');
     } catch (err) {
       showError(err.response?.data?.message || 'Failed to delete category');
     }
@@ -149,7 +121,7 @@ const AdminCategories = () => {
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
-      showSuccess('📥 Categories exported successfully!');
+      showSuccess('Categories exported');
     } catch (err) {
       showError(err.response?.data?.message || 'Export failed');
     }
@@ -163,7 +135,7 @@ const AdminCategories = () => {
       const data = new FormData();
       data.append('file', file);
       const res = await api.post('/admin/import/categories', data);
-      showSuccess(`📥 Import complete: ${res.data.imported} imported, ${res.data.failed} failed`);
+      showSuccess(`Import complete: ${res.data.imported} imported, ${res.data.failed} failed`);
       loadCategories();
     } catch (err) {
       showError(err.response?.data?.message || 'Import failed');
@@ -177,265 +149,303 @@ const AdminCategories = () => {
     <>
       <SEO
         title="Food Categories"
-        description="Admin dashboard for managing product categories and organization."
+        description="Admin dashboard for managing product categories."
         url="/admin/categories"
         noIndex
       />
+
       <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 bg-gradient-to-r from-orange-50 to-amber-50 p-6 rounded-2xl border-2 border-orange-200">
-        <div className="flex items-center gap-3">
-          <div className="p-3 bg-orange-100 rounded-xl">
-            <span className="text-2xl">🏷️</span>
-          </div>
+        {/* Header */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-800">Food Categories</h2>
-            <p className="text-sm text-gray-500">Manage your product categories</p>
+            <h1 className="text-2xl font-semibold tracking-tight text-gray-900">
+              Categories
+            </h1>
+            <p className="mt-1 text-sm text-gray-500">
+              Organize products into categories
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={handleExport}
+              className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Export
+            </button>
+            <label className="inline-flex items-center gap-2 rounded-lg bg-orange-600 px-3.5 py-2 text-sm font-medium text-white hover:bg-orange-700 transition-colors cursor-pointer">
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+              {importing ? 'Importing…' : 'Import'}
+              <input
+                type="file"
+                accept=".csv"
+                onChange={handleImport}
+                className="hidden"
+                disabled={importing}
+              />
+            </label>
           </div>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <button 
-            onClick={handleExport} 
-            className="bg-white text-orange-600 border-2 border-orange-200 px-4 py-2 rounded-xl text-sm font-medium hover:bg-orange-50 hover:border-orange-300 transition-all duration-200 shadow-sm flex items-center gap-2"
-          >
-            <span>📥</span> Export CSV
-          </button>
-          <label className="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-4 py-2 rounded-xl text-sm font-medium hover:from-orange-600 hover:to-amber-600 transition-all duration-200 shadow-md hover:shadow-lg active:scale-95 cursor-pointer flex items-center gap-2">
-            <span>📤</span> Import CSV
-            <input type="file" accept=".csv" onChange={handleImport} className="hidden" disabled={importing} />
-          </label>
+
+        {/* Add category */}
+        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+          <h2 className="text-sm font-semibold text-gray-900 mb-4">Add category</h2>
+          {error && (
+            <div className="mb-4">
+              <Alert variant="error">{error}</Alert>
+            </div>
+          )}
+          <form onSubmit={handleCreate} className="flex flex-col gap-3 sm:flex-row sm:items-end">
+            <div className="flex-1">
+              <label className="block text-xs font-medium text-gray-500 mb-1">Name</label>
+              <input
+                type="text"
+                placeholder="e.g. Bakery"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+              />
+            </div>
+            <div className="flex-1">
+              <label className="block text-xs font-medium text-gray-500 mb-1">Description</label>
+              <input
+                type="text"
+                placeholder="Optional"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+              />
+            </div>
+            <div className="w-24">
+              <label className="block text-xs font-medium text-gray-500 mb-1">Icon</label>
+              <input
+                type="text"
+                placeholder="🏷️"
+                value={icon}
+                onChange={(e) => setIcon(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-center focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+              />
+            </div>
+            <button
+              type="submit"
+              className="rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700 transition-colors whitespace-nowrap"
+            >
+              Add category
+            </button>
+          </form>
         </div>
-      </div>
 
-      {/* Add Category Form */}
-      <div className="bg-white rounded-2xl border-2 border-orange-200 p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
-        <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-          <span className="text-2xl">➕</span>
-          Add New Category
-        </h3>
-        {error && <Alert variant="error">{error}</Alert>}
-        <form onSubmit={handleCreate} className="flex flex-col sm:flex-row gap-3">
-          <input
-            type="text"
-            placeholder="Category name (e.g., Bakery)"
-            value={name}
-            onChange={e => setName(e.target.value)}
-            required
-            className="flex-1 px-4 py-2.5 bg-orange-50/50 border-2 border-orange-200 rounded-xl text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200 placeholder:text-gray-400"
-          />
-          <input
-            type="text"
-            placeholder="Description (optional)"
-            value={description}
-            onChange={e => setDescription(e.target.value)}
-            className="flex-1 px-4 py-2.5 bg-orange-50/50 border-2 border-orange-200 rounded-xl text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200 placeholder:text-gray-400"
-          />
-          <input
-            type="text"
-            placeholder="Icon emoji (e.g., 🍞)"
-            value={icon}
-            onChange={e => setIcon(e.target.value)}
-            className="w-20 px-3 py-2.5 bg-orange-50/50 border-2 border-orange-200 rounded-xl text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200 placeholder:text-gray-400 text-center"
-          />
-          <button 
-            type="submit" 
-            className="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:from-orange-600 hover:to-amber-600 transition-all duration-200 shadow-md hover:shadow-lg active:scale-95 whitespace-nowrap flex items-center gap-2"
-          >
-            <span>➕</span> Add Category
-          </button>
-        </form>
-      </div>
-
-      {/* Categories Table */}
-      <div className="bg-white rounded-2xl border-2 border-orange-200 overflow-hidden shadow-lg">
-        <div className="overflow-x-auto max-h-[450px] scrollbar-thin scrollbar-thumb-orange-200 scrollbar-track-orange-50">
-          <table className="w-full">
-            <thead className="bg-gradient-to-r from-orange-50 to-amber-50 border-b-2 border-orange-200 sticky top-0 z-10">
-              <tr>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">#</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Category</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Description</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Products</th>
-                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-orange-100">
-              {categories.map((cat, index) => (
-                <tr key={cat.id} className="hover:bg-orange-50/50 transition-colors duration-150 group">
-                  <td className="px-6 py-4 text-sm text-gray-500">{(page - 1) * 20 + index + 1}</td>
-                   <td className="px-6 py-4">
-                     {editingId === cat.id ? (
-                       <div className="space-y-2">
-                         <input
-                           type="text"
-                           value={editName}
-                           onChange={e => setEditName(e.target.value)}
-                           className="px-3 py-1.5 border-2 border-orange-200 rounded-lg text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200 w-full"
-                           placeholder="Name"
-                         />
-                         <input
-                           type="text"
-                           value={editIcon}
-                           onChange={e => setEditIcon(e.target.value)}
-                           className="px-3 py-1.5 border-2 border-orange-200 rounded-lg text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200 w-full"
-                           placeholder="Icon emoji"
-                         />
-                       </div>
-                     ) : (
-                       <div className="flex items-center gap-2">
-                         <span className="text-2xl">{cat.icon || getCategoryEmoji(cat.name)}</span>
-                         <span className="text-sm font-semibold text-gray-800">{cat.name}</span>
-                       </div>
-                     )}
-                   </td>
-                  <td className="px-6 py-4">
-                    {editingId === cat.id ? (
-                      <input
-                        type="text"
-                        value={editDescription}
-                        onChange={e => setEditDescription(e.target.value)}
-                        className="px-3 py-1.5 border-2 border-orange-200 rounded-lg text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200 w-full"
-                      />
-                    ) : (
-                      <span className="text-sm text-gray-600">{cat.description || '-'}</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="inline-flex items-center gap-1 bg-orange-100 text-orange-600 text-xs font-medium px-2.5 py-1 rounded-full">
-                      <span>📦</span>
-                      {cat.product_count || 0}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-right">
-                    {editingId === cat.id ? (
-                      <div className="flex gap-2 justify-end">
-                        <button 
-                          onClick={() => handleUpdate(cat.id)} 
-                          className="text-xs font-medium bg-green-100 text-green-600 hover:bg-green-200 px-3 py-1.5 rounded-lg transition-colors"
-                        >
-                          💾 Save
-                        </button>
-                        <button 
-                          onClick={() => { setEditingId(null); setEditName(''); setEditDescription(''); }} 
-                          className="text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 px-3 py-1.5 rounded-lg transition-colors"
-                        >
-                          ✖ Cancel
-                        </button>
-                      </div>
-                    ) : (
-                      <Dropdown 
-                        trigger={
-                          <button className="p-2 hover:bg-orange-100 rounded-lg transition-colors">
-                            <span className="text-xl">⋮</span>
+        {/* Table */}
+        <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b border-gray-100 bg-gray-50">
+                  <th className="px-5 py-3 text-xs font-medium uppercase tracking-wide text-gray-500">#</th>
+                  <th className="px-5 py-3 text-xs font-medium uppercase tracking-wide text-gray-500">Category</th>
+                  <th className="px-5 py-3 text-xs font-medium uppercase tracking-wide text-gray-500">Description</th>
+                  <th className="px-5 py-3 text-xs font-medium uppercase tracking-wide text-gray-500">Products</th>
+                  <th className="px-5 py-3 text-xs font-medium uppercase tracking-wide text-gray-500 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {categories.map((cat, index) => (
+                  <tr key={cat.id} className="hover:bg-gray-50/80 transition-colors">
+                    <td className="px-5 py-3.5 text-sm text-gray-400">
+                      {(page - 1) * 20 + index + 1}
+                    </td>
+                    <td className="px-5 py-3.5">
+                      {editingId === cat.id ? (
+                        <div className="space-y-2 max-w-xs">
+                          <input
+                            type="text"
+                            value={editName}
+                            onChange={(e) => setEditName(e.target.value)}
+                            className="w-full rounded-md border border-gray-300 px-2.5 py-1.5 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                            placeholder="Name"
+                          />
+                          <input
+                            type="text"
+                            value={editIcon}
+                            onChange={(e) => setEditIcon(e.target.value)}
+                            className="w-full rounded-md border border-gray-300 px-2.5 py-1.5 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                            placeholder="Icon"
+                          />
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2.5">
+                          <span className="text-xl leading-none">
+                            {cat.icon || getCategoryEmoji(cat.name)}
+                          </span>
+                          <span className="text-sm font-medium text-gray-900">{cat.name}</span>
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-5 py-3.5">
+                      {editingId === cat.id ? (
+                        <input
+                          type="text"
+                          value={editDescription}
+                          onChange={(e) => setEditDescription(e.target.value)}
+                          className="w-full max-w-xs rounded-md border border-gray-300 px-2.5 py-1.5 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                        />
+                      ) : (
+                        <span className="text-sm text-gray-600">
+                          {cat.description || '—'}
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700">
+                        {cat.product_count || 0}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3.5 text-right">
+                      {editingId === cat.id ? (
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => handleUpdate(cat.id)}
+                            className="rounded-md bg-orange-600 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-orange-700 transition-colors"
+                          >
+                            Save
                           </button>
-                        }
-                      >
-                        <button
-                          onClick={() => handleView(cat)}
-                          className="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-orange-50 transition-colors flex items-center gap-2"
+                          <button
+                            onClick={() => {
+                              setEditingId(null);
+                              setEditName('');
+                              setEditDescription('');
+                              setEditIcon('🏷️');
+                            }}
+                            className="rounded-md border border-gray-300 px-2.5 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      ) : (
+                        <Dropdown
+                          trigger={
+                            <button className="rounded-md p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors">
+                              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                              </svg>
+                            </button>
+                          }
                         >
-                          <span>👁️</span> View
-                        </button>
-                        <button
-                          onClick={() => { setEditingId(cat.id); setEditName(cat.name); setEditDescription(cat.description || ''); setEditIcon(cat.icon || '🏷️'); }}
-                          className="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-orange-50 transition-colors flex items-center gap-2"
-                        >
-                          <span>✏️</span> Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(cat.id)}
-                          className="block w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
-                        >
-                          <span>🗑️</span> Delete
-                        </button>
-                      </Dropdown>
-                    )}
-                  </td>
-                </tr>
-              ))}
-              {categories.length === 0 && (
-                <tr>
-                  <td colSpan="5" className="px-6 py-12 text-center">
-                    <div className="flex flex-col items-center gap-2">
-                      <span className="text-6xl">🍽️</span>
-                      <p className="text-gray-500 font-medium">No categories yet</p>
-                      <p className="text-sm text-gray-400">Add your first category to get started</p>
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex justify-center gap-2 items-center bg-white rounded-2xl border-2 border-orange-200 p-4 shadow-lg">
-          <button 
-            onClick={() => setPage(p => Math.max(1, p - 1))} 
-            disabled={page <= 1}
-            className="px-4 py-2 text-sm font-medium text-orange-600 border-2 border-orange-200 rounded-xl hover:bg-orange-50 hover:border-orange-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-          >
-            ← Previous
-          </button>
-          <div className="flex items-center gap-2 px-4 py-2 bg-orange-50 rounded-xl border border-orange-200">
-            <span className="text-sm font-medium text-gray-700">Page</span>
-            <span className="text-sm font-bold text-orange-600">{page}</span>
-            <span className="text-sm text-gray-500">of {totalPages}</span>
-          </div>
-          <button 
-            onClick={() => setPage(p => Math.min(totalPages, p + 1))} 
-            disabled={page >= totalPages}
-            className="px-4 py-2 text-sm font-medium text-orange-600 border-2 border-orange-200 rounded-xl hover:bg-orange-50 hover:border-orange-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-          >
-            Next →
-          </button>
-        </div>
-      )}
-
-      {/* View Category Modal */}
-      <Modal
-        isOpen={!!viewCategory}
-        onClose={() => setViewCategory(null)}
-        title={
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">👁️</span>
-            <span className="text-xl font-bold text-gray-800">Category Details</span>
-          </div>
-        }
-        size="md"
-      >
-        {viewCategory && (
-          <div className="space-y-4">
-            <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl border-2 border-orange-200">
-              <span className="text-6xl">{getCategoryEmoji(viewCategory.name)}</span>
-              <div>
-                <h3 className="text-xl font-bold text-gray-800">{viewCategory.name}</h3>
-                {viewCategory.description && (
-                  <p className="text-sm text-gray-600">{viewCategory.description}</p>
+                          <button
+                            onClick={() => handleView(cat)}
+                            className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
+                          >
+                            View
+                          </button>
+                          <button
+                            onClick={() => {
+                              setEditingId(cat.id);
+                              setEditName(cat.name);
+                              setEditDescription(cat.description || '');
+                              setEditIcon(cat.icon || '🏷️');
+                            }}
+                            className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(cat.id)}
+                            className="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"
+                          >
+                            Delete
+                          </button>
+                        </Dropdown>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+                {categories.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="px-5 py-16 text-center">
+                      <p className="text-sm font-medium text-gray-900">No categories yet</p>
+                      <p className="mt-1 text-sm text-gray-500">
+                        Create your first category using the form above
+                      </p>
+                    </td>
+                  </tr>
                 )}
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 bg-white rounded-xl border border-orange-200">
-                <p className="text-xs text-gray-500">Category ID</p>
-                <p className="text-sm font-mono font-semibold text-gray-800">#{viewCategory.id}</p>
-              </div>
-              <div className="p-4 bg-white rounded-xl border border-orange-200">
-                <p className="text-xs text-gray-500">Products</p>
-                <p className="text-sm font-semibold text-gray-800 flex items-center gap-1">
-                  <span>📦</span> {viewCategory.product_count || 0} products
-                </p>
-              </div>
-            </div>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-3">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1}
+              className="rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              Previous
+            </button>
+            <span className="text-sm text-gray-600">
+              Page <span className="font-medium text-gray-900">{page}</span> of {totalPages}
+            </span>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page >= totalPages}
+              className="rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              Next
+            </button>
           </div>
         )}
-      </Modal>
-    </div>
+
+        {/* View modal */}
+        <Modal
+          isOpen={!!viewCategory}
+          onClose={() => setViewCategory(null)}
+          title="Category details"
+          size="md"
+        >
+          {viewCategory && (
+            <div className="space-y-5">
+              <div className="flex items-center gap-4">
+                <span className="text-4xl leading-none">
+                  {viewCategory.icon || getCategoryEmoji(viewCategory.name)}
+                </span>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {viewCategory.name}
+                  </h3>
+                  {viewCategory.description && (
+                    <p className="mt-0.5 text-sm text-gray-500">
+                      {viewCategory.description}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+                  <p className="text-xs font-medium text-gray-500">ID</p>
+                  <p className="mt-0.5 text-sm font-medium text-gray-900">
+                    #{viewCategory.id}
+                  </p>
+                </div>
+                <div className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+                  <p className="text-xs font-medium text-gray-500">Products</p>
+                  <p className="mt-0.5 text-sm font-medium text-gray-900">
+                    {viewCategory.product_count || 0}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </Modal>
+      </div>
     </>
   );
 };
 
 export default AdminCategories;
-

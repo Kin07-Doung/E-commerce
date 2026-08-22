@@ -15,7 +15,7 @@ const OrderConfirmation = () => {
       try {
         const res = await api.get(`/orders/${id}`);
         setOrder(res.data);
-      } catch (err) {
+      } catch {
         showError('Failed to load order details');
       } finally {
         setLoading(false);
@@ -24,12 +24,42 @@ const OrderConfirmation = () => {
     loadOrder();
   }, [id, showError]);
 
+  const getStatusBadge = (status) => {
+    const styles = {
+      pending: 'bg-amber-50 text-amber-700 ring-amber-600/20',
+      processing: 'bg-blue-50 text-blue-700 ring-blue-600/20',
+      shipped: 'bg-violet-50 text-violet-700 ring-violet-600/20',
+      delivered: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
+      completed: 'bg-green-50 text-green-700 ring-green-600/20',
+      cancelled: 'bg-red-50 text-red-700 ring-red-600/20',
+    };
+    const style = styles[status?.toLowerCase()] || 'bg-gray-50 text-gray-700 ring-gray-600/20';
+    return (
+      <span
+        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ring-1 ring-inset ${style}`}
+      >
+        {status}
+      </span>
+    );
+  };
+
+  const getEstimatedDelivery = () => {
+    const date = new Date();
+    date.setDate(date.getDate() + 3);
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  };
+
   if (loading) {
     return (
-      <div className="container py-20 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin" />
-          <p className="text-orange-600 font-medium">Loading order details...</p>
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-10 w-10 rounded-full border-2 border-gray-200 border-t-orange-500 animate-spin" />
+          <p className="text-sm text-gray-500">Loading order…</p>
         </div>
       </div>
     );
@@ -37,181 +67,164 @@ const OrderConfirmation = () => {
 
   if (!order) {
     return (
-      <div className="container py-20 max-w-md mx-auto px-4">
-        <div className="bg-white rounded-2xl border-2 border-orange-200 p-12 text-center shadow-lg">
-          <span className="text-6xl block mb-4">🔍</span>
-          <h3 className="text-xl font-bold text-gray-800 mb-2">Order Not Found</h3>
-          <p className="text-gray-500 mb-6">We couldn't find your order. Please try again.</p>
-          <Link to="/products" className="inline-block bg-gradient-to-r from-orange-500 to-amber-500 text-white px-8 py-3 rounded-xl font-medium hover:from-orange-600 hover:to-amber-600 transition-all duration-200 shadow-md hover:shadow-lg active:scale-95">
-            Browse Products
+      <div className="min-h-[60vh] flex items-center justify-center px-4">
+        <div className="w-full max-w-md rounded-xl border border-gray-200 bg-white p-10 text-center shadow-sm">
+          <h2 className="text-lg font-semibold text-gray-900">Order not found</h2>
+          <p className="mt-2 text-sm text-gray-500">
+            We couldn’t find this order. It may have been removed or the link is invalid.
+          </p>
+          <Link
+            to="/products"
+            className="mt-6 inline-flex items-center justify-center rounded-lg bg-orange-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-orange-700 transition-colors"
+          >
+            Browse products
           </Link>
         </div>
       </div>
     );
   }
 
-  const getStatusEmoji = (status) => {
-    const statusMap = {
-      'pending': '⏳',
-      'processing': '🔄',
-      'shipped': '🚚',
-      'delivered': '✅',
-      'completed': '🎉',
-      'cancelled': '❌'
-    };
-    return statusMap[status?.toLowerCase()] || '📦';
-  };
-
-  const getStatusColor = (status) => {
-    const colorMap = {
-      'pending': 'bg-yellow-100 text-yellow-700 border-yellow-200',
-      'processing': 'bg-blue-100 text-blue-700 border-blue-200',
-      'shipped': 'bg-purple-100 text-purple-700 border-purple-200',
-      'delivered': 'bg-green-100 text-green-700 border-green-200',
-      'completed': 'bg-emerald-100 text-emerald-700 border-emerald-200',
-      'cancelled': 'bg-red-100 text-red-700 border-red-200'
-    };
-    return colorMap[status?.toLowerCase()] || 'bg-gray-100 text-gray-700 border-gray-200';
-  };
-
-  const getEstimatedDelivery = () => {
-    const date = new Date();
-    date.setDate(date.getDate() + 3);
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'long',
-      month: 'long', 
-      day: 'numeric',
-      year: 'numeric'
-    });
-  };
-
   return (
     <>
       <SEO
         title="Order Confirmed"
-        description={`Thank you for your order #${order.id}! Your fresh food is being packed with care.`}
+        description={`Thank you for your order #${order.id}.`}
         url={`/order-confirmation/${id}`}
       />
-      <div className="container py-8 max-w-2xl mx-auto px-4">
-      {/* Confirmation Card */}
-      <div className="bg-white rounded-2xl border-2 border-orange-200 shadow-xl overflow-hidden">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-orange-50 to-amber-50 p-6 border-b-2 border-orange-200">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-3xl shadow-md">
-              ✅
-            </div>
-             <div>
-               <h2 className="text-2xl font-bold text-gray-800">Order Confirmed!</h2>
-               <p className="text-sm text-gray-500">Thank you for your order</p>
-               <p className="font-handwritten text-orange-500 text-base">
-                 We'll pack this with extra love
-               </p>
-             </div>
-          </div>
-        </div>
 
-        {/* Content */}
-        <div className="p-6 space-y-6">
-          {/* Order Info */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 bg-orange-50 rounded-xl border-2 border-orange-200">
-              <p className="text-xs text-gray-500">Order ID</p>
-              <p className="text-sm font-mono font-bold text-orange-600">#{order.id}</p>
+      <div className="bg-gray-50 min-h-screen">
+        <div className="mx-auto max-w-xl px-4 py-12 sm:px-6">
+          {/* Success header */}
+          <div className="text-center mb-8">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
             </div>
-            <div className="p-4 bg-orange-50 rounded-xl border-2 border-orange-200">
-              <p className="text-xs text-gray-500">Status</p>
-              <div className="flex items-center gap-1.5 mt-1">
-                <span>{getStatusEmoji(order.status)}</span>
-                <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold border-2 ${getStatusColor(order.status)}`}>
-                  {order.status}
+            <h1 className="text-2xl font-semibold tracking-tight text-gray-900">
+              Order confirmed
+            </h1>
+            <p className="mt-2 text-sm text-gray-500">
+              Thank you. We’ve received your order and will start preparing it shortly.
+            </p>
+          </div>
+
+          {/* Order card */}
+          <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+            <div className="border-b border-gray-100 px-5 py-4 sm:px-6">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-medium text-gray-500">Order ID</p>
+                  <p className="mt-0.5 text-sm font-semibold font-mono text-gray-900">
+                    #{order.id}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs font-medium text-gray-500">Status</p>
+                  <div className="mt-1">{getStatusBadge(order.status)}</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-5 px-5 py-5 sm:px-6">
+              {/* Total */}
+              <div className="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-3">
+                <span className="text-sm font-medium text-gray-600">Order total</span>
+                <span className="text-lg font-semibold text-gray-900">
+                  ${parseFloat(order.total).toFixed(2)}
                 </span>
               </div>
-            </div>
-          </div>
 
-          {/* Total */}
-          <div className="p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl border-2 border-orange-200 text-center">
-            <p className="text-xs text-gray-500">Order Total</p>
-            <p className="text-3xl font-bold text-orange-600">${parseFloat(order.total).toFixed(2)}</p>
-          </div>
-
-          {/* Delivery Info */}
-          <div className="p-4 bg-blue-50 rounded-xl border-2 border-blue-200">
-            <div className="flex items-start gap-3">
-              <span className="text-2xl">🚚</span>
+              {/* Estimated delivery */}
               <div>
-                <p className="text-sm font-semibold text-gray-800">Estimated Delivery</p>
-                <p className="text-sm text-gray-600">{getEstimatedDelivery()}</p>
-                <p className="text-xs text-gray-400 mt-1">Free delivery on this order</p>
+                <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+                  Estimated delivery
+                </p>
+                <p className="mt-1 text-sm font-medium text-gray-900">
+                  {getEstimatedDelivery()}
+                </p>
+                <p className="mt-0.5 text-xs text-gray-500">Free delivery on this order</p>
               </div>
-            </div>
-          </div>
 
-          {/* Shipping Address */}
-          {order.shipping_address && (
-            <div className="p-4 bg-white rounded-xl border-2 border-orange-200">
-              <p className="text-xs font-semibold text-gray-500 mb-2 flex items-center gap-1">
-                <span>📍</span> Shipping Address
-              </p>
-              <pre className="text-sm text-gray-700 whitespace-pre-line font-sans">
-                {order.shipping_address}
-              </pre>
-            </div>
-          )}
-
-          {/* Order Items Preview */}
-          {order.items && order.items.length > 0 && (
-            <div className="p-4 bg-white rounded-xl border-2 border-orange-200">
-              <p className="text-xs font-semibold text-gray-500 mb-2 flex items-center gap-1">
-                <span>🍽️</span> Order Items ({order.items.length})
-              </p>
-              <div className="space-y-2">
-                {order.items.slice(0, 3).map((item, index) => (
-                  <div key={index} className="flex justify-between text-sm py-1 border-b border-orange-100 last:border-0">
-                    <span className="text-gray-700">{item.product_name || `Item ${index + 1}`}</span>
-                    <span className="font-semibold text-gray-800">${parseFloat(item.price || 0).toFixed(2)}</span>
-                  </div>
-                ))}
-                {order.items.length > 3 && (
-                  <p className="text-xs text-gray-400 text-center pt-1">
-                    + {order.items.length - 3} more items
+              {/* Shipping address */}
+              {order.shipping_address && (
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+                    Shipping address
                   </p>
-                )}
-              </div>
+                  <p className="mt-1 whitespace-pre-line text-sm text-gray-700">
+                    {order.shipping_address}
+                  </p>
+                </div>
+              )}
+
+              {/* Items preview */}
+              {order.items && order.items.length > 0 && (
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-gray-400 mb-2">
+                    Items ({order.items.length})
+                  </p>
+                  <ul className="divide-y divide-gray-100 rounded-lg border border-gray-100">
+                    {order.items.slice(0, 4).map((item, index) => (
+                      <li
+                        key={index}
+                        className="flex justify-between gap-2 px-3 py-2.5 text-sm"
+                      >
+                        <span className="min-w-0 truncate text-gray-700">
+                          {item.product_name || `Item ${index + 1}`}
+                          {item.quantity > 1 && (
+                            <span className="text-gray-400"> × {item.quantity}</span>
+                          )}
+                        </span>
+                        <span className="shrink-0 font-medium text-gray-900">
+                          ${parseFloat(item.price || 0).toFixed(2)}
+                        </span>
+                      </li>
+                    ))}
+                    {order.items.length > 4 && (
+                      <li className="px-3 py-2 text-center text-xs text-gray-400">
+                        + {order.items.length - 4} more
+                      </li>
+                    )}
+                  </ul>
+                </div>
+              )}
             </div>
-          )}
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t-2 border-orange-200">
-            <Link to="/products" className="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 text-white px-6 py-3 rounded-xl font-medium hover:from-orange-600 hover:to-amber-600 transition-all duration-200 shadow-md hover:shadow-lg active:scale-95 text-center flex items-center justify-center gap-2">
-              <span>🍽️</span> Continue Shopping
-            </Link>
-            <Link to="/orders" className="flex-1 bg-white border-2 border-orange-200 text-orange-600 px-6 py-3 rounded-xl font-medium hover:bg-orange-50 hover:border-orange-300 transition-all duration-200 text-center flex items-center justify-center gap-2">
-              <span>📋</span> View All Orders
-            </Link>
+            {/* Actions */}
+            <div className="border-t border-gray-100 px-5 py-4 sm:px-6 flex flex-col gap-2 sm:flex-row">
+              <Link
+                to="/products"
+                className="flex-1 inline-flex items-center justify-center rounded-lg bg-orange-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-orange-700 transition-colors"
+              >
+                Continue shopping
+              </Link>
+              <Link
+                to="/orders"
+                className="flex-1 inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                View orders
+              </Link>
+            </div>
           </div>
 
-          {/* Trust Badges */}
-          <div className="flex flex-wrap justify-center gap-4 pt-4 border-t-2 border-orange-100 text-xs text-gray-400">
-            <span className="flex items-center gap-1">🔒 Secure Payment</span>
-            <span className="flex items-center gap-1">🚚 Free Delivery</span>
-            <span className="flex items-center gap-1">⭐ Fresh Guarantee</span>
-            <span className="flex items-center gap-1">💬 24/7 Support</span>
-          </div>
+          {/* Help */}
+          <p className="mt-8 text-center text-sm text-gray-500">
+            Need help?{' '}
+            <Link
+              to="/contact"
+              className="font-medium text-orange-600 hover:text-orange-700 transition-colors"
+            >
+              Contact support
+            </Link>
+          </p>
         </div>
       </div>
-
-      {/* Help Section */}
-      <div className="mt-6 p-4 bg-orange-50 rounded-xl border-2 border-orange-200 text-center">
-        <p className="text-sm text-gray-600">
-          Need help with your order? 
-          <Link to="/contact" className="text-orange-600 font-medium hover:text-orange-700 ml-1">
-            Contact Support →
-          </Link>
-        </p>
-      </div>
-    </div>
     </>
   );
 };
