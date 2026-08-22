@@ -11,6 +11,7 @@ const orderRoutes = require('./routes/orders');
 const adminRoutes = require('./routes/admin');
 const userRoutes = require('./routes/user');
 const wishlistRoutes = require('./routes/wishlist');
+const { globalLimiter } = require('./middleware/rateLimiter');
 
 const app = express();
 
@@ -18,6 +19,8 @@ app.use(compression());
 app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
+
+app.use('/api', globalLimiter);
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);

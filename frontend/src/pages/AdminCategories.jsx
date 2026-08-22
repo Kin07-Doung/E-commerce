@@ -329,11 +329,11 @@ const AdminCategories = () => {
                       ) : (
                         <Dropdown
                           trigger={
-                            <button className="rounded-md p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors">
+                            <div className="rounded-md p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors">
                               <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                               </svg>
-                            </button>
+                            </div>
                           }
                         >
                           <button

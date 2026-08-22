@@ -106,3 +106,13 @@ CREATE TABLE wishlist_items (
 );
 
 INSERT INTO categories (name) VALUES ('Electronics'), ('Clothing'), ('Books'), ('Home & Kitchen');
+
+CREATE TABLE IF NOT EXISTS rate_limits (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  ip_key VARCHAR(255) UNIQUE NOT NULL,
+  count INT NOT NULL DEFAULT 0,
+  expires_at DATETIME NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_expires (expires_at),
+  INDEX idx_ip_key (ip_key)
+);

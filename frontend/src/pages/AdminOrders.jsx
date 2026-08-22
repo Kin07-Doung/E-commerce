@@ -158,28 +158,28 @@ const AdminOrders = () => {
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50">
-                  <th className="px-5 py-3 text-xs font-medium uppercase tracking-wide text-gray-500">
+                  <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-gray-500">
                     Order
                   </th>
-                  <th className="px-5 py-3 text-xs font-medium uppercase tracking-wide text-gray-500">
+                  <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-gray-500">
                     Customer
                   </th>
-                  <th className="px-5 py-3 text-xs font-medium uppercase tracking-wide text-gray-500">
+                  <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-gray-500">
                     Payment
                   </th>
-                  <th className="px-5 py-3 text-xs font-medium uppercase tracking-wide text-gray-500">
-                    Items
+                  <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-gray-500">
+                    Qty
                   </th>
-                  <th className="px-5 py-3 text-xs font-medium uppercase tracking-wide text-gray-500">
+                  <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-gray-500">
                     Total
                   </th>
-                  <th className="px-5 py-3 text-xs font-medium uppercase tracking-wide text-gray-500">
+                  <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-gray-500">
                     Status
                   </th>
-                  <th className="px-5 py-3 text-xs font-medium uppercase tracking-wide text-gray-500">
+                  <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-gray-500">
                     Date
                   </th>
-                  <th className="px-5 py-3 text-xs font-medium uppercase tracking-wide text-gray-500">
+                  <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-gray-500">
                     Update
                   </th>
                 </tr>
@@ -190,40 +190,45 @@ const AdminOrders = () => {
                     key={order.id}
                     className="hover:bg-gray-50/80 transition-colors"
                   >
-                    <td className="px-5 py-3.5">
+                    <td className="px-6 py-4">
                       <span className="text-sm font-medium text-gray-900">
                         #{order.id}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5">
+                    <td className="px-6 py-4">
                       <div>
                         <p className="text-sm font-medium text-gray-900">
-                          {order.user?.name || 'Guest'}
+                          {order.user_name || order.user?.name || 'Guest'}
                         </p>
                         <p className="mt-0.5 max-w-[180px] truncate text-xs text-gray-500">
                           {order.shipping_address || '—'}
                         </p>
                       </div>
                     </td>
-                    <td className="px-5 py-3.5">
+                    <td className="px-6 py-4">
                       <span className="text-sm capitalize text-gray-600">
                         {order.payment_method || 'cash'}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5">
-                      <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700">
-                        {order.items?.length || 0}
-                      </span>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col">
+                        <span className="text-sm font-semibold text-gray-900">
+                          {order.total_quantity ?? 0}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {order.item_count ?? 0} {order.item_count === 1 ? 'product' : 'products'}
+                        </span>
+                      </div>
                     </td>
-                    <td className="px-5 py-3.5">
+                    <td className="px-6 py-4">
                       <span className="text-sm font-semibold text-gray-900">
                         ${parseFloat(order.total).toFixed(2)}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5">
+                    <td className="px-6 py-4">
                       {getStatusBadge(order.status)}
                     </td>
-                    <td className="px-5 py-3.5">
+                    <td className="px-6 py-4">
                       <div>
                         <p className="text-sm text-gray-700">
                           {new Date(order.created_at).toLocaleDateString()}
@@ -236,7 +241,7 @@ const AdminOrders = () => {
                         </p>
                       </div>
                     </td>
-                    <td className="px-5 py-3.5">
+                    <td className="px-6 py-4">
                       <select
                         value={order.status}
                         onChange={(e) => updateStatus(order.id, e.target.value)}
@@ -254,7 +259,7 @@ const AdminOrders = () => {
                 ))}
                 {filteredOrders.length === 0 && (
                   <tr>
-                    <td colSpan={8} className="px-5 py-16 text-center">
+                    <td colSpan={8} className="px-6 py-16 text-center">
                       <p className="text-sm font-medium text-gray-900">
                         No orders found
                       </p>

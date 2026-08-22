@@ -4,7 +4,7 @@ const Category = {
   async findAll(page = 1, limit = 20) {
     const offset = (page - 1) * limit;
     const [rows] = await pool.query(
-      'SELECT * FROM categories ORDER BY id ASC LIMIT ? OFFSET ?',
+      'SELECT c.*, (SELECT COUNT(*) FROM products WHERE category_id = c.id) AS product_count FROM categories c ORDER BY id ASC LIMIT ? OFFSET ?',
       [limit, offset]
     );
     return rows;
@@ -16,7 +16,7 @@ const Category = {
   },
 
   async findById(id) {
-    const [rows] = await pool.query('SELECT * FROM categories WHERE id = ?', [id]);
+    const [rows] = await pool.query('SELECT c.*, (SELECT COUNT(*) FROM products WHERE category_id = c.id) AS product_count FROM categories c WHERE c.id = ?', [id]);
     return rows[0];
   },
 

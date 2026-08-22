@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
+import { useRateLimit } from '../hooks/useRateLimit';
 import SEO from '../components/SEO';
 
 const ResetPassword = () => {
@@ -12,6 +13,7 @@ const ResetPassword = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const token = searchParams.get('token');
+  const { isRateLimited, retryAfter, handleError, clearRateLimit, RateLimitBanner } = useRateLimit();
 
   useEffect(() => {
     if (!token) {
@@ -35,13 +37,21 @@ const ResetPassword = () => {
       setError('Password must be at least 6 characters');
       return;
     }
+    const recaptchaToken = window.grecaptcha?.getResponse();
+    if (!recaptchaToken) {
+      setError('Please complete the reCAPTCHA');
+      return;
+    }
     setLoading(true);
     try {
-      await api.post('/auth/reset-password', { token, password });
+      await api.post('/auth/reset-password', { token, password, recaptchaToken });
       setMessage('Password reset successful. Redirecting to login…');
       setTimeout(() => navigate('/login'), 2500);
+      clearRateLimit();
     } catch (err) {
-      setError(err.response?.data?.message || 'Something went wrong');
+      if (!handleError(err)) {
+        setError(err.response?.data?.message || 'Something went wrong');
+      }
     } finally {
       setLoading(false);
     }
@@ -79,17 +89,18 @@ const ResetPassword = () => {
               </p>
             </div>
 
-            {/* Alerts */}
-            {error && (
-              <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                {error}
-              </div>
-            )}
-            {message && (
-              <div className="mt-6 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-                {message}
-              </div>
-            )}
+             {/* Alerts */}
+             {error && !isRateLimited && (
+               <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                 {error}
+               </div>
+             )}
+             {message && (
+               <div className="mt-6 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                 {message}
+               </div>
+             )}
+             <RateLimitBanner />
             {!token && !error && (
               <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                 Invalid or missing reset token. Please request a new password reset link.
@@ -151,15 +162,21 @@ const ResetPassword = () => {
                   </li>
                 </ul>
 
+                <div
+                  id="recaptcha-reset"
+                  data-sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                  className="g-recaptcha flex justify-center"
+                />
+
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || isRateLimited}
                   className="flex w-full items-center justify-center gap-2 rounded-lg bg-orange-600 py-2.5 text-sm font-medium text-white hover:bg-orange-700 transition-colors disabled:cursor-not-allowed disabled:bg-gray-300"
                 >
-                  {loading ? (
+                  {(loading || isRateLimited) ? (
                     <>
                       <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                      Resetting…
+                      {isRateLimited ? `Wait ${retryAfter}s` : 'Resetting…'}
                     </>
                   ) : (
                     'Reset password'
