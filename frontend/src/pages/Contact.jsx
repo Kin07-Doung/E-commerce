@@ -12,7 +12,7 @@ const Contact = () => {
     <>
       <SEO
         title="Contact Us"
-        description="Get in touch with FoodHub support. Call +1 (555) 123-4567 or email support@foodhub.com."
+        description="Get in touch with Kin Shop support. Call +855 883 996 258 or email kindoung7@gmail.com."
         url="/contact"
       />
 
@@ -45,7 +45,7 @@ const Contact = () => {
                   <div>
                     <p className="text-sm font-medium text-gray-900">Address</p>
                     <p className="mt-0.5 text-sm text-gray-500">
-                      123 Food Street, Culinary City, FC 12345
+                      Phnom Penh, Cambodia
                     </p>
                   </div>
                 </li>
@@ -57,7 +57,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-900">Phone</p>
-                    <p className="mt-0.5 text-sm text-gray-500">+1 (555) 123-4567</p>
+                    <p className="mt-0.5 text-sm text-gray-500">+855 883 996 258</p>
                   </div>
                 </li>
                 <li className="flex gap-3">
@@ -68,7 +68,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-900">Email</p>
-                    <p className="mt-0.5 text-sm text-gray-500">support@foodhub.com</p>
+                    <p className="mt-0.5 text-sm text-gray-500">kindoung7@gmail.com</p>
                   </div>
                 </li>
                 <li className="flex gap-3">

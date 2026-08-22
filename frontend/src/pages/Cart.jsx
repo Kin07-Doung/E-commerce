@@ -97,6 +97,7 @@ const Cart = () => {
         title="Your Cart"
         description="Review your items and proceed to checkout."
         url="/cart"
+        noIndex
       />
 
       <div className="bg-gray-50 min-h-screen">

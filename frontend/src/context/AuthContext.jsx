@@ -1,26 +1,27 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext } from 'react';
 import api from '../services/api';
 
 const AuthContext = createContext(null);
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
+const restoreAuth = () => {
+  try {
     const token = localStorage.getItem('token');
     if (token) {
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
-      }
     }
-    setLoading(false);
-  }, []);
+    const storedUser = localStorage.getItem('user');
+    return storedUser ? JSON.parse(storedUser) : null;
+  } catch {
+    return null;
+  }
+};
 
-  const login = async (email, password) => {
-    const response = await api.post('/auth/login', { email, password });
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(restoreAuth);
+  const [loading, setLoading] = useState(false);
+
+  const login = async (email, password, recaptchaToken) => {
+    const response = await api.post('/auth/login', { email, password, recaptchaToken });
     const { user, token } = response.data;
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(user));
@@ -29,8 +30,8 @@ export const AuthProvider = ({ children }) => {
     return user;
   };
 
-  const register = async (name, email, password) => {
-    const response = await api.post('/auth/register', { name, email, password });
+  const register = async (name, email, password, recaptchaToken) => {
+    const response = await api.post('/auth/register', { name, email, password, recaptchaToken });
     const { user, token } = response.data;
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(user));

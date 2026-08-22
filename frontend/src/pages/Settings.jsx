@@ -115,6 +115,7 @@ const Settings = () => {
         title="Account Settings"
         description="Update your personal information and password."
         url="/settings"
+        noIndex
       />
 
       <div className="bg-gray-50 min-h-screen">

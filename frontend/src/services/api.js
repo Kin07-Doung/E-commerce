@@ -13,6 +13,11 @@ api.interceptors.response.use(
       localStorage.removeItem('user');
       window.location.href = '/login';
     }
+    if (error.response?.status === 429) {
+      const resetHeader = error.response.headers['ratelimit-reset'];
+      const retryAfter = resetHeader ? parseInt(resetHeader, 10) : 60;
+      error.retryAfter = retryAfter;
+    }
     return Promise.reject(error);
   }
 );

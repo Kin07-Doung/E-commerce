@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useGoogleSignIn } from '../hooks/useGoogleSignIn';
+import { useRateLimit } from '../hooks/useRateLimit';
 import SEO from '../components/SEO';
 
 const Register = () => {
@@ -11,6 +12,7 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { register, googleSignIn } = useAuth();
+  const { isRateLimited, retryAfter, handleError, clearRateLimit, RateLimitBanner } = useRateLimit();
   const navigate = useNavigate();
 
   const handleGoogleSignIn = async (credential) => {
@@ -29,10 +31,19 @@ const Register = () => {
     setError('');
     setLoading(true);
     try {
-      await register(name, email, password);
+      const token = window.grecaptcha?.getResponse();
+      if (!token) {
+        setError('Please complete the reCAPTCHA');
+        setLoading(false);
+        return;
+      }
+      await register(name, email, password, token);
+      clearRateLimit();
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
+      if (!handleError(err)) {
+        setError(err.response?.data?.message || 'Registration failed');
+      }
     } finally {
       setLoading(false);
     }
@@ -42,7 +53,7 @@ const Register = () => {
     <>
       <SEO
         title="Create Account"
-        description="Join FoodHub and start ordering. Free delivery on orders over $50."
+        description="Join Kin Shop and start ordering. Free delivery on orders over $50."
         url="/register"
         noIndex
       />
@@ -56,16 +67,17 @@ const Register = () => {
                 Create account
               </h1>
               <p className="mt-2 text-sm text-gray-500">
-                Join FoodHub to order fresh food and track deliveries
+                Join Kin Shop to order fresh food and track deliveries
               </p>
             </div>
 
-            {/* Error */}
-            {error && (
-              <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                {error}
-              </div>
-            )}
+             {/* Error */}
+             {error && !isRateLimited && (
+               <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                 {error}
+               </div>
+             )}
+             <RateLimitBanner />
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="mt-6 space-y-4">
@@ -113,15 +125,21 @@ const Register = () => {
                 </p>
               </div>
 
+              <div
+                id="recaptcha-register"
+                data-sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                className="g-recaptcha flex justify-center"
+              />
+
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || isRateLimited}
                 className="flex w-full items-center justify-center gap-2 rounded-lg bg-orange-600 py-2.5 text-sm font-medium text-white hover:bg-orange-700 transition-colors disabled:cursor-not-allowed disabled:bg-gray-300"
               >
-                {loading ? (
+                {(loading || isRateLimited) ? (
                   <>
                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                    Creating account…
+                    {isRateLimited ? `Wait ${retryAfter}s` : 'Creating account…'}
                   </>
                 ) : (
                   'Create account'

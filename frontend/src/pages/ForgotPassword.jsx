@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
+import { useRateLimit } from '../hooks/useRateLimit';
 import SEO from '../components/SEO';
 
 const ForgotPassword = () => {
@@ -8,6 +9,7 @@ const ForgotPassword = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const { isRateLimited, retryAfter, handleError, clearRateLimit, RateLimitBanner } = useRateLimit();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,11 +17,20 @@ const ForgotPassword = () => {
     setMessage('');
     setLoading(true);
     try {
-      const response = await api.post('/auth/forgot-password', { email });
+      const token = window.grecaptcha?.getResponse();
+      if (!token) {
+        setError('Please complete the reCAPTCHA');
+        setLoading(false);
+        return;
+      }
+      const response = await api.post('/auth/forgot-password', { email, recaptchaToken: token });
       setMessage(response.data.message);
       setEmail('');
+      clearRateLimit();
     } catch (err) {
-      setError(err.response?.data?.message || 'Something went wrong');
+      if (!handleError(err)) {
+        setError(err.response?.data?.message || 'Something went wrong');
+      }
     } finally {
       setLoading(false);
     }
@@ -29,7 +40,7 @@ const ForgotPassword = () => {
     <>
       <SEO
         title="Forgot Password"
-        description="Reset your FoodHub account password. Enter your email to receive a secure reset link."
+        description="Reset your Kin Shop account password. Enter your email to receive a secure reset link."
         url="/forgot-password"
         noIndex
       />
@@ -57,17 +68,18 @@ const ForgotPassword = () => {
               </p>
             </div>
 
-            {/* Alerts */}
-            {error && (
-              <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                {error}
-              </div>
-            )}
-            {message && (
-              <div className="mt-6 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-                {message}
-              </div>
-            )}
+             {/* Alerts */}
+             {error && !isRateLimited && (
+               <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                 {error}
+               </div>
+             )}
+             {message && (
+               <div className="mt-6 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                 {message}
+               </div>
+             )}
+             <RateLimitBanner />
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="mt-6 space-y-5">
@@ -85,15 +97,21 @@ const ForgotPassword = () => {
                 />
               </div>
 
+              <div
+                id="recaptcha-forgot"
+                data-sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                className="g-recaptcha flex justify-center"
+              />
+
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || isRateLimited}
                 className="flex w-full items-center justify-center gap-2 rounded-lg bg-orange-600 py-2.5 text-sm font-medium text-white hover:bg-orange-700 transition-colors disabled:cursor-not-allowed disabled:bg-gray-300"
               >
-                {loading ? (
+                {(loading || isRateLimited) ? (
                   <>
                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                    Sending…
+                    {isRateLimited ? `Wait ${retryAfter}s` : 'Sending…'}
                   </>
                 ) : (
                   'Send reset link'

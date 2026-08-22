@@ -5,6 +5,8 @@ const User = require('../models/User');
 const axios = require('axios');
 const crypto = require('crypto');
 const { sendPasswordResetEmail } = require('../utils/email');
+const { verifyRecaptcha } = require('../middleware/recaptcha');
+const { authLimiter } = require('../middleware/rateLimiter');
 
 const router = express.Router();
 
@@ -17,8 +19,9 @@ const generateToken = (user) => {
 router.post('/register', [
   body('name').notEmpty().withMessage('Name is required'),
   body('email').isEmail().withMessage('Valid email is required'),
-  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
-], async (req, res) => {
+  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+  body('recaptchaToken').notEmpty().withMessage('reCAPTCHA token is required')
+], authLimiter, verifyRecaptcha, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -43,8 +46,9 @@ router.post('/register', [
 
 router.post('/login', [
   body('email').isEmail().withMessage('Valid email is required'),
-  body('password').notEmpty().withMessage('Password is required')
-], async (req, res) => {
+  body('password').notEmpty().withMessage('Password is required'),
+  body('recaptchaToken').notEmpty().withMessage('reCAPTCHA token is required')
+], authLimiter, verifyRecaptcha, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -104,8 +108,9 @@ router.post('/google', async (req, res) => {
 });
 
 router.post('/forgot-password', [
-  body('email').isEmail().withMessage('Valid email is required')
-], async (req, res) => {
+  body('email').isEmail().withMessage('Valid email is required'),
+  body('recaptchaToken').notEmpty().withMessage('reCAPTCHA token is required')
+], authLimiter, verifyRecaptcha, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -134,8 +139,9 @@ router.post('/forgot-password', [
 
 router.post('/reset-password', [
   body('token').notEmpty().withMessage('Reset token is required'),
-  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
-], async (req, res) => {
+  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+  body('recaptchaToken').notEmpty().withMessage('reCAPTCHA token is required')
+], authLimiter, verifyRecaptcha, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });

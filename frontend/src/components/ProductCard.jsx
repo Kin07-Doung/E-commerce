@@ -35,32 +35,14 @@ const ProductCard = ({ product, onAddToCart, wishlistIds, onToggleWishlist }) =>
     }
   };
 
-  const getCategoryEmoji = (category) => {
-    const emojis = {
-      'bakery': '🍞',
-      'dairy': '🥛',
-      'meat': '🥩',
-      'seafood': '🐟',
-      'fruits': '🍎',
-      'vegetables': '🥬',
-      'organic': '🌿',
-      'fresh': '✨',
-      'seasonal': '🍂',
-      'spices': '🌶️',
-      'beverages': '🥤',
-      'snacks': '🍿'
-    };
-    return emojis[category?.toLowerCase()] || '🍽️';
-  };
-
   return (
-    <div className="group bg-white rounded-2xl border-2 border-orange-100 overflow-hidden hover:border-orange-400 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 wobble-hover">
+    <div className="group bg-white rounded-2xl border-2 border-orange-100 shadow-sm hover:border-orange-400 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 wobble-hover p-1">
       <Link to={`/products/${product.id}`} className="block">
         {/* Image Container */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-orange-50 to-amber-50">
+        <div className="rounded-xl overflow-hidden bg-gradient-to-br from-orange-50 to-amber-50 h-full">
           <img 
             loading="lazy" 
-            src={product.image_url || 'data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20300%20300%22%3E%3Crect%20fill=%22%23fef3c7%22%20width=%22300%22%20height=%22300%22/%3E%3Ctext%20fill=%22%23f59e0b%22%20font-family=%22sans-serif%22%20font-size=%2248%22%20x=%2250%25%22%20y=%2250%25%22%20text-anchor=%22middle%22%20dy=%22.3em%22%3E🍽️%3C/text%3E%3C/svg%3E'} 
+            src={product.image_url || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%200%20300%20300%22%3E%3Crect fill=%22%23fef3c7%22 width=%22300%22 height=%22300%22/%3E%3Ctext fill=%22%23f59e0b%22 font-family=%22sans-serif%22 font-size=%2248%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22%3E🍽️%3C/text%3E%3C/svg%3E'} 
             alt={product.name} 
             className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500" 
           />
@@ -99,13 +81,6 @@ const ProductCard = ({ product, onAddToCart, wishlistIds, onToggleWishlist }) =>
             </span>
           )}
 
-          {/* Category Badge */}
-          <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-md">
-            <span className="flex items-center gap-1.5 text-xs font-medium text-orange-600">
-              <span>{getCategoryEmoji(product.category_name)}</span>
-              <span>{product.category_name || 'Food'}</span>
-            </span>
-          </div>
         </div>
 
         {/* Content */}

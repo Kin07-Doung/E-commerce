@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
 const AdminLayout = () => {
-  const { user, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -37,7 +37,15 @@ const AdminLayout = () => {
       }
     };
     loadNotifications();
-  }, []);
+  }, [user]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="h-10 w-10 rounded-full border-2 border-gray-200 border-t-orange-500 animate-spin" />
+      </div>
+    );
+  }
 
   if (!user || user.role !== 'admin') {
     return (
@@ -92,9 +100,9 @@ const AdminLayout = () => {
             className="flex items-center gap-2 text-sm font-semibold text-gray-900"
           >
             <span className="flex h-7 w-7 items-center justify-center rounded-md bg-orange-600 text-xs font-bold text-white">
-              FH
+              KS
             </span>
-            FoodHub
+            Kin Shop
             <span className="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-gray-500">
               Admin
             </span>

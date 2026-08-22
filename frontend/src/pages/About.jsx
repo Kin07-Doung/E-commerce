@@ -36,8 +36,8 @@ const About = () => {
   return (
     <>
       <SEO
-        title="About FoodHub"
-        description="Learn about FoodHub — fresh ingredients and delicious meals delivered to your door."
+        title="About Kin Shop"
+        description="Learn about Kin Shop — fresh ingredients and delicious meals delivered to your door."
         url="/about"
       />
 
@@ -46,7 +46,7 @@ const About = () => {
           {/* Page header */}
           <div className="mb-10 text-center">
             <h1 className="text-3xl font-semibold tracking-tight text-gray-900">
-              About FoodHub
+              About Kin Shop
             </h1>
             <p className="mt-3 text-base text-gray-500 max-w-xl mx-auto">
               Fresh food, thoughtfully sourced, delivered to your door.
@@ -57,7 +57,7 @@ const About = () => {
           <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
             <div className="px-6 py-8 sm:px-8 sm:py-10 space-y-6">
               <p className="text-gray-700 leading-relaxed">
-                FoodHub is your one-stop shop for fresh, quality ingredients and
+                Kin Shop is your one-stop shop for fresh, quality ingredients and
                 delicious meals. We started with a simple mission: to bring the
                 best of the culinary world right to your doorstep.
               </p>

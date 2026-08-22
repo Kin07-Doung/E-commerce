@@ -143,6 +143,7 @@ const Profile = () => {
         title="My Profile"
         description="Manage your account, orders, wishlist, and preferences."
         url="/profile"
+        noIndex
       />
 
       <div className="bg-gray-50 min-h-screen">

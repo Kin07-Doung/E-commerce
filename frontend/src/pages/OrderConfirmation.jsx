@@ -90,6 +90,7 @@ const OrderConfirmation = () => {
         title="Order Confirmed"
         description={`Thank you for your order #${order.id}.`}
         url={`/order-confirmation/${id}`}
+        noIndex
       />
 
       <div className="bg-gray-50 min-h-screen">
