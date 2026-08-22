@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 
-const SITE_NAME = 'E-Order';
+const SITE_NAME = 'Kin Shop';
 const BASE_URL = 'https://e-order.student-edu.online';
 const DEFAULT_DESCRIPTION = 'E-Order — Order delicious food online easily and conveniently.';
 const DEFAULT_IMAGE = `${BASE_URL}/og-image.png`;
